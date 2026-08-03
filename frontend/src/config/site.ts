@@ -9,4 +9,5 @@ export const siteConfig = {
     { title: "How It Works", href: "/how-it-works" },
     { title: "Contact", href: "/contact" },
   ],
+  
 };
