@@ -22,7 +22,7 @@ const stats = [
 
 export default function Statistics() {
   return (
-    <section className="bg-blue-600 py-24 text-white">
+    <section id="statistics" className="bg-blue-600 py-24 text-white">
       <Container>
         <div className="text-center">
           <h2 className="text-4xl font-bold">

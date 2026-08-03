@@ -4,6 +4,7 @@ import Categories from "@/components/home/Categories";
 import HowItWorks from "@/components/home/HowItWorks";
 import Features from "@/components/home/Features";
 import Statistics from "@/components/home/Statistics";
+import FAQ from "@/components/home/FAQ";
 export default function Home() {
   return (
     <>
@@ -15,6 +16,7 @@ export default function Home() {
         <HowItWorks />
         <Features />
         <Statistics />
+        <FAQ />
       </main>
     </>
   );

@@ -3,7 +3,8 @@ import Button from "@/components/ui/Button";
 
 export default function Hero() {
   return (
-    <section className="bg-gradient-to-b from-blue-50 via-white to-white py-24">
+    <section id="hero" className="bg-gradient-to-b from-blue-50 via-white to-white py-24">
+       
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-2">
 
