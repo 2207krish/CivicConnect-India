@@ -1,54 +1,40 @@
 import Container from "@/components/layout/Container";
-import Card from "@/components/ui/Card";
+import { civicImages } from "@/config/media";
 
 const stats = [
-  {
-    value: "25K+",
-    label: "Complaints Submitted",
-  },
-  {
-    value: "500+",
-    label: "Cities Covered",
-  },
-  {
-    value: "50+",
-    label: "Government Authorities",
-  },
-  {
-    value: "95%",
-    label: "Successful Routing",
-  },
+  { value: "20", label: "Cities mapped" },
+  { value: "60+", label: "Civic desks on file" },
+  { value: "10", label: "Complaint categories" },
+  { value: "1 ID", label: "To track any case" },
 ];
 
 export default function Statistics() {
   return (
-    <section id="statistics" className="bg-blue-600 py-24 text-white">
-      <Container>
+    <section id="statistics" className="relative overflow-hidden py-24 text-white">
+      <img
+        src={civicImages.gateway}
+        alt="Gateway of India"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-[rgba(11,27,51,0.82)]" />
+      <Container className="relative">
         <div className="text-center">
-          <h2 className="text-4xl font-bold">
-            Trusted by Citizens Across India
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-2xl text-blue-100">
-            CivicConnect simplifies civic issue reporting by connecting
-            citizens with the right authorities.
+          <h2 className="font-display text-4xl">Trusted by citizens across India</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-slate-200">
+            CivicConnect simplifies civic issue reporting by connecting citizens
+            with the right authorities.
           </p>
         </div>
 
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
-            <Card
+            <div
               key={stat.label}
-              className="border-white/20 bg-white/10 p-8 text-center shadow-none hover:bg-white/20"
+              className="rounded-3xl border border-white/15 bg-white/10 p-8 text-center backdrop-blur-md"
             >
-              <h3 className="text-5xl font-bold text-white">
-                {stat.value}
-              </h3>
-
-              <p className="mt-3 text-blue-100">
-                {stat.label}
-              </p>
-            </Card>
+              <h3 className="font-display text-5xl text-amber-300">{stat.value}</h3>
+              <p className="mt-3 text-slate-200">{stat.label}</p>
+            </div>
           ))}
         </div>
       </Container>

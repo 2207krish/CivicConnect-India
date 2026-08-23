@@ -2,38 +2,47 @@ import Container from "@/components/layout/Container";
 
 const faqs = [
   {
-    question: "Is CivicConnect free to use?",
+    question: "What do I need before I register?",
     answer:
-      "Yes. CivicConnect is completely free for citizens to report civic issues.",
+      "Your full name, a working email ID, a 10-digit mobile number, and your residential address with PIN code. After you submit the form, a 6-digit token is emailed to you. The account is activated only after that token is verified.",
   },
   {
-    question: "Can I upload photos with my complaint?",
+    question: "Why do I have to verify my email?",
     answer:
-      "Yes. You can attach multiple images to provide evidence for your complaint.",
+      "The token proves that the email belongs to you. Until it is confirmed, you cannot log in, see civic desks, or file a complaint. The token expires in 15 minutes and can be resent from the verification page.",
   },
   {
-    question: "How does AI help?",
+    question: "How do you find the nearest civic body?",
     answer:
-      "AI generates a professional complaint draft based on the information you provide.",
+      "We match your city, state and PIN code against municipal corporations, electricity DISCOMs, water boards and traffic desks. Exact PIN matches rank highest, then the same postal circle, then the same city.",
   },
   {
-    question: "Will my complaint reach the correct authority?",
+    question: "Where does my complaint go?",
     answer:
-      "CivicConnect identifies the appropriate department based on the issue category and location.",
+      "It is emailed to the registered complaint desk of the matched civic body. You receive a tracking ID immediately and can open the same letter in your own email client if you want a personal copy.",
+  },
+  {
+    question: "Can I track a complaint without logging in?",
+    answer:
+      "Yes. Open Track and enter the CivicConnect ID printed on your acknowledgement, for example CCI-NEW-20260823-ROAD.",
+  },
+  {
+    question: "Is there a demo account?",
+    answer:
+      "Yes. Use citizen@demo.in with password Demo@123. It is preloaded with a New Delhi address and sample complaints.",
   },
 ];
 
 export default function FAQ() {
   return (
-    <section id="faq" className="bg-slate-50 py-24">
+    <section id="faq" className="bg-[#efe7d8] py-24">
       <Container>
         <div className="text-center">
-          <h2 className="text-4xl font-bold">
-            Frequently Asked Questions
+          <h2 className="font-display text-4xl text-[var(--navy)]">
+            Frequently asked questions
           </h2>
-
           <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-            Find answers to the most common questions about CivicConnect.
+            What you need, how routing works, and how tracking stays with you.
           </p>
         </div>
 
@@ -41,15 +50,12 @@ export default function FAQ() {
           {faqs.map((faq) => (
             <details
               key={faq.question}
-              className="rounded-xl border bg-white p-5"
+              className="rounded-2xl border border-[#e5dccb] bg-white p-5 shadow-sm"
             >
-              <summary className="cursor-pointer font-semibold">
+              <summary className="cursor-pointer font-semibold text-[var(--navy)]">
                 {faq.question}
               </summary>
-
-              <p className="mt-4 text-slate-600">
-                {faq.answer}
-              </p>
+              <p className="mt-4 text-slate-600">{faq.answer}</p>
             </details>
           ))}
         </div>

@@ -1,0 +1,112 @@
+"use client";
+
+import { Suspense, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import AuthSplit from "@/components/layout/AuthSplit";
+import Container from "@/components/layout/Container";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { civicImages } from "@/config/media";
+import { useAuth } from "@/context/AuthContext";
+import { AuthApiError } from "@/lib/auth-client";
+import { loginSchema, type LoginValues } from "@/lib/validators";
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <section className="py-16">
+          <Container className="text-sm text-slate-500">Loading login...</Container>
+        </section>
+      }
+    >
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { login } = useAuth();
+  const [formError, setFormError] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
+
+  async function onSubmit(values: LoginValues) {
+    setFormError("");
+    try {
+      await login(values.email, values.password);
+      router.push(searchParams.get("next") || "/dashboard");
+    } catch (error) {
+      if (error instanceof AuthApiError && error.code === "UNVERIFIED") {
+        router.push(
+          `/verify-email?email=${encodeURIComponent(error.email || values.email)}`
+        );
+        return;
+      }
+      setFormError(error instanceof Error ? error.message : "Login failed.");
+    }
+  }
+
+  return (
+    <AuthSplit
+      image={civicImages.gateway}
+      eyebrow="Citizen access"
+      title="Sign in to reach your nearest civic desk."
+    >
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--saffron)]">
+        Welcome back
+      </p>
+      <h1 className="font-display mt-3 text-4xl text-[var(--navy)]">Login</h1>
+      <p className="mt-3 text-slate-600">
+        Use a verified email to file a complaint or review cases you have already sent.
+      </p>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-8 space-y-5 rounded-[28px] border border-[#e5dccb] bg-white p-6 shadow-[0_20px_50px_rgba(20,32,51,0.08)]"
+      >
+        <Input
+          label="Email ID"
+          type="email"
+          placeholder="citizen@demo.in"
+          error={errors.email?.message}
+          {...register("email")}
+        />
+        <Input
+          label="Password"
+          type="password"
+          error={errors.password?.message}
+          {...register("password")}
+        />
+        {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Signing in..." : "Login to portal"}
+        </Button>
+      </form>
+
+      <div className="mt-6 rounded-2xl bg-[#f7efe3] p-4 text-sm text-[var(--navy)]">
+        Demo citizen: <strong>citizen@demo.in</strong> / <strong>Demo@123</strong>
+      </div>
+
+      <p className="mt-6 text-sm text-slate-600">
+        New here?{" "}
+        <Link href="/register" className="font-semibold text-[var(--saffron)]">
+          Register with your address
+        </Link>
+      </p>
+    </AuthSplit>
+  );
+}
