@@ -34,6 +34,9 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           {user ? (
             <>
+              <Button variant="outline" href="/download">
+                Get the app
+              </Button>
               <Button variant="outline" href="/dashboard">
                 Dashboard
               </Button>
@@ -48,6 +51,9 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <Button variant="outline" href="/download">
+                Get the app
+              </Button>
               <Button variant="outline" href="/login">
                 Login
               </Button>
@@ -81,6 +87,7 @@ export default function Navbar() {
             ))}
             {user ? (
               <>
+                <Button href="/download">Get the app</Button>
                 <Button href="/dashboard">Dashboard</Button>
                 <Button variant="outline" href="/complaints/new">
                   Report complaint
@@ -98,6 +105,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                <Button href="/download">Get the app</Button>
                 <Button href="/login">Login</Button>
                 <Button variant="outline" href="/register">
                   Register

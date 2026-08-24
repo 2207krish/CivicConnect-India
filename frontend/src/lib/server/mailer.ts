@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "fs";
+import path from "path";
 import nodemailer from "nodemailer";
 
 interface SendMailInput {
@@ -7,63 +9,97 @@ interface SendMailInput {
   html: string;
 }
 
+function loadLocalEnv() {
+  const candidates = [
+    path.join(process.cwd(), ".env.local"),
+    path.join(process.cwd(), "frontend", ".env.local"),
+  ];
+  for (const file of candidates) {
+    if (!existsSync(file)) continue;
+    for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq < 1) continue;
+      const key = trimmed.slice(0, eq).trim();
+      let value = trimmed.slice(eq + 1).trim();
+      if (
+        (value.startsWith("\"") && value.endsWith("\"")) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      if (!process.env[key]) process.env[key] = value;
+    }
+  }
+}
+
+loadLocalEnv();
+
 function smtpConfigured() {
   return Boolean(
-    process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
+    process.env.SMTP_HOST?.trim() &&
+      process.env.SMTP_USER?.trim() &&
+      process.env.SMTP_PASS?.trim()
   );
 }
 
-async function createTransport() {
-  if (smtpConfigured()) {
-    return {
-      transporter: nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT || 587),
-        secure: process.env.SMTP_PORT === "465",
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      }),
-      preview: false,
-    };
+function smtpErrorMessage(error: unknown) {
+  const raw = error instanceof Error ? error.message : "SMTP send failed.";
+  if (/invalid login|eauth|username and password/i.test(raw)) {
+    return "Gmail rejected the SMTP login. Use a 16-character App Password, not your normal Gmail password.";
+  }
+  if (/self signed|certificate/i.test(raw)) {
+    return "SMTP TLS certificate was rejected. Check SMTP_HOST and SMTP_PORT.";
+  }
+  if (/connection timeout|econnrefused|enotfound/i.test(raw)) {
+    return "Could not reach the SMTP server. Check SMTP_HOST, SMTP_PORT, and your internet connection.";
+  }
+  return raw;
+}
+
+function createSmtpTransport() {
+  if (!smtpConfigured()) {
+    throw new Error(
+      "SMTP_USER and SMTP_PASS are still empty in frontend/.env.local. Put your Gmail address and a 16-character Google App Password there, save the file, and restart the site."
+    );
   }
 
-  const testAccount = await nodemailer.createTestAccount();
-  return {
-    transporter: nodemailer.createTransport({
-      host: testAccount.smtp.host,
-      port: testAccount.smtp.port,
-      secure: testAccount.smtp.secure,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    }),
-    preview: true,
-  };
+  const port = Number(process.env.SMTP_PORT || 587);
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465,
+    requireTLS: port === 587,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 }
 
 export async function sendMail(input: SendMailInput) {
-  const { transporter, preview } = await createTransport();
+  const transporter = createSmtpTransport();
   const from =
     process.env.SMTP_FROM ||
-    process.env.SMTP_USER ||
-    "CivicConnect India <noreply@civicconnect.in>";
+    `CivicConnect India <${process.env.SMTP_USER}>`;
 
-  const info = await transporter.sendMail({
-    from,
-    to: input.to,
-    subject: input.subject,
-    text: input.text,
-    html: input.html,
-  });
-
-  const testUrl = preview ? nodemailer.getTestMessageUrl(info) : null;
+  try {
+    await transporter.sendMail({
+      from,
+      to: input.to,
+      replyTo: process.env.SMTP_USER,
+      subject: input.subject,
+      text: input.text,
+      html: input.html,
+    });
+  } catch (error) {
+    throw new Error(smtpErrorMessage(error));
+  }
 
   return {
-    previewUrl: typeof testUrl === "string" ? testUrl : null,
-    delivery: smtpConfigured() ? ("smtp" as const) : ("preview" as const),
+    previewUrl: null,
+    delivery: "smtp" as const,
   };
 }
 

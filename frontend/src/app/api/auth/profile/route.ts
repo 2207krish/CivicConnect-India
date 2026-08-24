@@ -7,9 +7,13 @@ import { updateUserProfile } from "@/lib/server/users";
 
 export const runtime = "nodejs";
 
+export async function POST(request: Request) {
+  return PATCH(request);
+}
+
 export async function PATCH(request: Request) {
   try {
-    const current = await getCurrentUser();
+    const current = await getCurrentUser(request);
     if (!current) {
       return NextResponse.json({ error: "You need to sign in first." }, { status: 401 });
     }

@@ -15,8 +15,8 @@ import Textarea from "@/components/ui/Textarea";
 import { useAuth } from "@/context/AuthContext";
 import { complaintCategories, getCategory } from "@/data/categories";
 import { CITIES_BY_STATE, INDIAN_STATES, lookupPincode } from "@/data/locations";
+import { apiCreateComplaint } from "@/lib/complaints-client";
 import { findBestBodyForDepartment } from "@/lib/matching";
-import { createComplaint } from "@/lib/storage";
 import { complaintSchema, type ComplaintValues } from "@/lib/validators";
 import type { ComplaintPhoto } from "@/types";
 
@@ -99,15 +99,13 @@ function NewComplaintForm() {
 
     setFormError("");
     try {
-      const { complaint } = createComplaint({
-        user,
+      const { complaint } = await apiCreateComplaint({
         categoryId: values.categoryId,
         title: values.title,
         description: values.description,
         landmark: values.landmark,
-        photos,
+        useRegisteredAddress: values.useRegisteredAddress,
         address: values.useRegisteredAddress ? user.address : values.address,
-        civicBodyId: match.body.id,
       });
       router.push(`/complaints/${complaint.trackingId}`);
     } catch (error) {

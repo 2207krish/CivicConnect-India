@@ -7,6 +7,7 @@ import Container from "@/components/layout/Container";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { civicBodies, listCoveredCities } from "@/data/civic-bodies";
+import AdSlot from "@/components/ads/AdSlot";
 
 export default function CivicBodiesPage() {
   const [query, setQuery] = useState("");
@@ -48,6 +49,8 @@ export default function CivicBodiesPage() {
         </div>
 
         <p className="mt-4 text-sm text-slate-500">{results.length} offices found</p>
+
+        <AdSlot slotKey="directory" />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           {results.map((body) => (

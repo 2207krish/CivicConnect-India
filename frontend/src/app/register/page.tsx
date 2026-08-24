@@ -202,7 +202,16 @@ export default function RegisterPage() {
                   {...register("address.city")}
                 />
               )}
-              {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
+              {formError ? (
+                <p className="text-sm text-red-600">
+                  {formError}{" "}
+                  {formError.toLowerCase().includes("already exists") ? (
+                    <Link href="/forgot-password" className="font-semibold text-[var(--saffron)]">
+                      Forgot password?
+                    </Link>
+                  ) : null}
+                </p>
+              ) : null}
               <div className="flex flex-wrap gap-3">
                 <Button type="button" variant="outline" onClick={() => setStep(1)}>
                   Back
@@ -219,6 +228,16 @@ export default function RegisterPage() {
         Already registered?{" "}
         <Link href="/login" className="font-semibold text-[var(--saffron)]">
           Login
+        </Link>
+        {" · "}
+        <Link href="/forgot-password" className="font-semibold text-[var(--saffron)]">
+          Forgot password?
+        </Link>
+      </p>
+      <p className="mt-3 text-sm text-slate-600">
+        Prefer the phone app?{" "}
+        <Link href="/download" className="font-semibold text-[var(--saffron)]">
+          Download the Android APK
         </Link>
       </p>
     </AuthSplit>

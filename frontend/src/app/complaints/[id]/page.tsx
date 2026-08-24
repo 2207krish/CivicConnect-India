@@ -13,26 +13,37 @@ import { useAuth } from "@/context/AuthContext";
 import { getCategory } from "@/data/categories";
 import { buildMailto } from "@/lib/email";
 import { formatAddress } from "@/lib/matching";
-import {
-  confirmComplaintResolution,
-  getComplaintByTrackingId,
-  getDispatchForComplaint,
-} from "@/lib/storage";
+import { apiResolveComplaint, apiTrackComplaint } from "@/lib/complaints-client";
 import { statusLabel, statusTone } from "@/lib/status";
+import AdSlot from "@/components/ads/AdSlot";
+import type { Complaint, EmailDispatch } from "@/types";
 
 export default function ComplaintDetailPage() {
   const params = useParams<{ id: string }>();
   const { user } = useAuth();
   const [refresh, setRefresh] = useState(0);
   const [loaded, setLoaded] = useState(false);
-  const [complaint, setComplaint] = useState<ReturnType<typeof getComplaintByTrackingId>>(null);
+  const [complaint, setComplaint] = useState<Complaint | null>(null);
+  const [dispatch, setDispatch] = useState<EmailDispatch | null>(null);
 
   useEffect(() => {
-    setComplaint(getComplaintByTrackingId(decodeURIComponent(params.id)));
-    setLoaded(true);
+    let active = true;
+    apiTrackComplaint(decodeURIComponent(params.id))
+      .then((result) => {
+        if (!active) return;
+        setComplaint(result.complaint);
+        setDispatch(result.dispatch);
+      })
+      .catch(() => {
+        if (active) setComplaint(null);
+      })
+      .finally(() => {
+        if (active) setLoaded(true);
+      });
+    return () => {
+      active = false;
+    };
   }, [params.id, refresh]);
-
-  const dispatch = complaint ? getDispatchForComplaint(complaint.id) : null;
   const category = complaint ? getCategory(complaint.categoryId) : null;
   const isOwner = Boolean(user && complaint && user.id === complaint.userId);
 
@@ -148,8 +159,8 @@ export default function ComplaintDetailPage() {
               <Button
                 className="mt-6 w-full"
                 variant="outline"
-                onClick={() => {
-                  confirmComplaintResolution(complaint.id, user!.id);
+                onClick={async () => {
+                  await apiResolveComplaint(complaint.id);
                   setRefresh((value) => value + 1);
                 }}
               >
@@ -161,6 +172,9 @@ export default function ComplaintDetailPage() {
             Back to dashboard
           </Button>
         </aside>
+      </Container>
+      <Container className="pb-10">
+        <AdSlot slotKey="complaint" />
       </Container>
     </section>
   );

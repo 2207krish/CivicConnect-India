@@ -91,6 +91,16 @@ function LoginForm() {
           error={errors.password?.message}
           {...register("password")}
         />
+        <div className="text-right">
+          <Link href="/forgot-password" className="text-sm font-semibold text-[var(--saffron)]">
+            Forgot password?
+          </Link>
+        </div>
+        {searchParams.get("reset") === "1" ? (
+          <p className="text-sm text-emerald-700">
+            Password updated. Sign in with your new password.
+          </p>
+        ) : null}
         {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Signing in..." : "Login to portal"}
@@ -105,6 +115,12 @@ function LoginForm() {
         New here?{" "}
         <Link href="/register" className="font-semibold text-[var(--saffron)]">
           Register with your address
+        </Link>
+      </p>
+      <p className="mt-3 text-sm text-slate-600">
+        Prefer the phone app?{" "}
+        <Link href="/download" className="font-semibold text-[var(--saffron)]">
+          Download the Android APK
         </Link>
       </p>
     </AuthSplit>

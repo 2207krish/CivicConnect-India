@@ -29,10 +29,11 @@ export default function Button({
   const classes = cn(baseClass, variants[variant], className);
 
   if (href) {
-    const external = href.startsWith("http") || href.startsWith("mailto:");
+    const fileDownload = href.endsWith(".apk") || href.includes("/downloads/");
+    const external = href.startsWith("http") || href.startsWith("mailto:") || fileDownload;
     if (external) {
       return (
-        <a href={href} className={classes}>
+        <a href={href} className={classes} {...(fileDownload ? { download: "civicconnect-india.apk" } : {})}>
           {children}
         </a>
       );

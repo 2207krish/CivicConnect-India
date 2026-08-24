@@ -4,6 +4,8 @@ import "./globals.css";
 import Providers from "./providers";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import AdSenseScript from "@/components/ads/AdSenseScript";
+import { adsenseConfig, adsenseReady } from "@/config/adsense";
 import { siteConfig } from "@/config/site";
 
 const outfit = Outfit({
@@ -24,6 +26,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: siteConfig.name,
   description: siteConfig.description,
+  ...(adsenseReady()
+    ? { other: { "google-adsense-account": adsenseConfig.client } }
+    : {}),
 };
 
 export default function RootLayout({
@@ -38,6 +43,7 @@ export default function RootLayout({
       className={`${outfit.variable} ${fraunces.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col text-[var(--foreground)]">
+        <AdSenseScript />
         <Providers>
           <Navbar />
           <main className="flex-1">{children}</main>

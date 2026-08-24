@@ -7,21 +7,21 @@ import AuthSplit from "@/components/layout/AuthSplit";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { civicImages } from "@/config/media";
-import { getComplaintByTrackingId } from "@/lib/storage";
+import { apiTrackComplaint } from "@/lib/complaints-client";
 
 export default function TrackPage() {
   const router = useRouter();
   const [trackingId, setTrackingId] = useState("");
   const [error, setError] = useState("");
 
-  function onSubmit(event: React.FormEvent) {
+  async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const complaint = getComplaintByTrackingId(trackingId);
-    if (!complaint) {
-      setError("No complaint found for this ID. Check the code and try again.");
-      return;
+    try {
+      const { complaint } = await apiTrackComplaint(trackingId);
+      router.push(`/complaints/${complaint.trackingId}`);
+    } catch (trackError) {
+      setError(trackError instanceof Error ? trackError.message : "No complaint found for this ID.");
     }
-    router.push(`/complaints/${complaint.trackingId}`);
   }
 
   return (

@@ -127,50 +127,23 @@ function VerifyEmailForm() {
         <h1 className="font-display mt-3 text-4xl text-[var(--navy)]">Verify your email</h1>
         <p className="mt-3 text-slate-600">
           {email
-            ? `A verification token was generated for ${email}.`
+            ? `A 6-digit token was emailed to ${email}. Open that inbox and enter the token here.`
             : "Enter the email you registered with."}
         </p>
 
-        {inbox?.delivery === "preview" ? (
-          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">
-            <p className="font-semibold">The token is not in Gmail yet.</p>
+        {inbox?.delivery === "smtp" ? (
+          <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-950">
+            <p className="font-semibold">Token sent to your real inbox.</p>
             <p className="mt-2 leading-6">
-              SMTP is not configured on this computer, so CivicConnect cannot
-              deliver mail to your real inbox. The message is stored in the
-              portal mailbox below. Copy the 6-digit token and verify to continue.
+              Check Gmail (and Spam / Promotions). The CivicConnect message
+              includes the 6-digit token and a verify link. It expires in 15 minutes.
             </p>
           </div>
         ) : (
           <p className="mt-6 text-sm text-slate-500">
-            Check your inbox and spam folder. The token expires in 15 minutes.
+            If the email has not arrived, wait a minute and tap Resend token.
           </p>
         )}
-
-        {inbox?.otp ? (
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              CivicConnect mailbox
-            </p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{inbox.subject}</p>
-            <p className="mt-1 text-xs text-slate-500">
-              To {inbox.to} · {new Date(inbox.sentAt).toLocaleString("en-IN")}
-            </p>
-            <p className="mt-5 text-sm text-slate-600">Your one-time token</p>
-            <p className="mt-2 text-center font-mono text-4xl font-bold tracking-[0.35em] text-slate-900">
-              {inbox.otp}
-            </p>
-            {inbox.previewUrl ? (
-              <a
-                href={inbox.previewUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-block text-sm font-medium text-[var(--saffron)]"
-              >
-                Also open the generated email
-              </a>
-            ) : null}
-          </div>
-        ) : null}
 
         {linkBusy ? (
           <p className="mt-8 text-sm text-slate-500">Checking the link from your email...</p>

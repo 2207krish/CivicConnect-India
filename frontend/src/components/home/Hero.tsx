@@ -29,6 +29,13 @@ export default function Hero() {
             <Button href="/register">Create citizen account</Button>
             <Button
               variant="outline"
+              href="/download"
+              className="border-white/30 bg-white/10 text-white hover:border-amber-300 hover:text-amber-200"
+            >
+              Download Android app
+            </Button>
+            <Button
+              variant="outline"
               href="/track"
               className="border-white/30 bg-white/10 text-white hover:border-amber-300 hover:text-amber-200"
             >

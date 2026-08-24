@@ -85,6 +85,25 @@ export async function markUserEmailVerified(email: string) {
   return toPublicUser(updated);
 }
 
+export async function updateUserPassword(email: string, password: string) {
+  const salt = createSalt();
+  const passwordHash = await hashPassword(password, salt);
+  let updated: StoredUser | null = null;
+  await mutateUsers((users) =>
+    users.map((user) => {
+      if (user.email.toLowerCase() !== email.trim().toLowerCase()) {
+        return user;
+      }
+      updated = { ...user, salt, passwordHash, emailVerified: true };
+      return updated;
+    })
+  );
+  if (!updated) {
+    throw new Error("No account was found for this email.");
+  }
+  return toPublicUser(updated);
+}
+
 export async function updateUserProfile(
   userId: string,
   patch: Partial<Pick<PublicUser, "name" | "phone" | "address" | "nearestBodyIds">>

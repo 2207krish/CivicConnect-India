@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 import Protected from "@/components/auth/Protected";
 import CivicBodyCard from "@/components/civic/CivicBodyCard";
@@ -12,8 +12,10 @@ import Card from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
 import { getCategory } from "@/data/categories";
 import { assignHomeCivicBodies, formatAddress } from "@/lib/matching";
-import { getUserComplaints } from "@/lib/storage";
+import { apiListComplaints } from "@/lib/complaints-client";
 import { statusLabel, statusTone } from "@/lib/status";
+import AdSlot from "@/components/ads/AdSlot";
+import type { Complaint } from "@/types";
 
 export default function DashboardPage() {
   return (
@@ -25,10 +27,14 @@ export default function DashboardPage() {
 
 function DashboardContent() {
   const { user } = useAuth();
-  const complaints = useMemo(
-    () => (user ? getUserComplaints(user.id) : []),
-    [user]
-  );
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    apiListComplaints()
+      .then((result) => setComplaints(result.complaints))
+      .catch(() => setComplaints([]));
+  }, [user]);
   const matches = user ? assignHomeCivicBodies(user.address) : [];
 
   if (!user) return null;
@@ -75,6 +81,8 @@ function DashboardContent() {
             <CivicBodyCard key={match.body.id} match={match} />
           ))}
         </div>
+
+        <AdSlot slotKey="dashboard" />
 
         <div className="mt-12 flex items-center justify-between">
           <h2 className="text-2xl font-bold">Your complaints</h2>

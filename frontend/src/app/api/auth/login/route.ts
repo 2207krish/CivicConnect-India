@@ -40,7 +40,11 @@ export async function POST(request: Request) {
 
     const token = await createSession(stored.id);
     await setSessionCookie(token);
-    return NextResponse.json({ ok: true, user: asPublicUser(stored) });
+    return NextResponse.json({
+      ok: true,
+      user: asPublicUser(stored),
+      sessionToken: token,
+    });
   } catch (error) {
     return NextResponse.json(
       { error: publicError(error, "Login failed.") },

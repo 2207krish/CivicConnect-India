@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
     const token = await createSession(stored.id);
     await setSessionCookie(token);
-    return NextResponse.json({ ok: true, user });
+    return NextResponse.json({ ok: true, user, sessionToken: token });
   } catch (error) {
     return NextResponse.json(
       { error: publicError(error, "Email verification failed.") },

@@ -92,7 +92,12 @@ export async function apiVerifyEmail(input: {
 }
 
 export async function apiSendVerification(email: string, name?: string) {
-  return parseResponse<{ ok: true; email: string; previewUrl: string | null }>(
+  return parseResponse<{
+    ok: true;
+    email: string;
+    delivery?: "smtp" | "preview";
+    previewUrl: string | null;
+  }>(
     await fetch("/api/auth/send-verification", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -114,6 +119,32 @@ export async function apiVerificationInbox(email: string) {
       delivery: "preview" | "smtp";
     } | null;
   }>(await fetch(`/api/auth/inbox?email=${encodeURIComponent(email)}`));
+}
+
+export async function apiForgotPassword(email: string) {
+  return parseResponse<{ ok: true; email: string; message: string }>(
+    await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    })
+  );
+}
+
+export async function apiResetPassword(input: {
+  email: string;
+  otp?: string;
+  token?: string;
+  password: string;
+  confirmPassword: string;
+}) {
+  return parseResponse<{ ok: true; user: PublicUser; sessionToken?: string | null }>(
+    await fetch("/api/auth/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    })
+  );
 }
 
 export async function apiUpdateProfile(input: {

@@ -1,0 +1,3 @@
+# CivicConnect India
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.android.gms.common.** { *; }

@@ -63,6 +63,31 @@ export const sendVerificationSchema = z.object({
   name: z.string().min(1).optional(),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Enter a valid email address"),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    email: z.string().email("Enter a valid email address"),
+    otp: z.string().regex(/^\d{6}$/, "Enter the 6-digit token").optional(),
+    token: z.string().min(16, "Invalid reset link").optional(),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Include one uppercase letter")
+      .regex(/[0-9]/, "Include one number"),
+    confirmPassword: z.string(),
+  })
+  .refine((value) => Boolean(value.otp || value.token), {
+    message: "Enter the email token or use the reset link",
+    path: ["otp"],
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export const verifyEmailSchema = z
   .object({
     email: z.string().email("Enter a valid email address"),
