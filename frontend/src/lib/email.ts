@@ -12,6 +12,7 @@ export function composeComplaintEmail(input: {
   landmark?: string;
   address: Address;
   civicBody: CivicBody;
+  photoCount?: number;
 }) {
   const subject = `[${input.trackingId}] Civic complaint — ${input.categoryTitle} — ${input.address.area || input.address.city}`;
 
@@ -35,6 +36,10 @@ export function composeComplaintEmail(input: {
     ``,
     `Details of the problem:`,
     input.description,
+    ``,
+    input.photoCount
+      ? `Site photos: ${input.photoCount} compressed image(s) are attached on the CivicConnect tracking page.`
+      : null,
     ``,
     `I request you to kindly inspect the site and take necessary action at the earliest. I am available on ${input.citizenPhone} / ${input.citizenEmail} for any clarification.`,
     ``,

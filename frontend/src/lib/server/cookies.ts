@@ -10,7 +10,10 @@ export async function setSessionCookie(token: string) {
     value: token,
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure:
+      process.env.FORCE_HTTPS === "true" ||
+      Boolean(process.env.APP_URL?.startsWith("https://")) ||
+      process.env.NODE_ENV === "production",
     path: "/",
     maxAge: MAX_AGE,
   });

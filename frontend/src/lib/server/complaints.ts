@@ -2,6 +2,7 @@ import { getCategory } from "@/data/categories";
 import { getCivicBodyById } from "@/data/civic-bodies";
 import { composeComplaintEmail, createDispatch } from "@/lib/email";
 import { findBestBodyForDepartment } from "@/lib/matching";
+import { saveCompressedPhotos } from "@/lib/server/compress-image";
 import { updateStore } from "@/lib/server/data-store";
 import { generateTrackingId, refreshComplaintStatus } from "@/lib/status";
 import type { Address, Complaint, EmailDispatch, PublicUser } from "@/types";
@@ -119,6 +120,7 @@ export async function createServerComplaint(input: {
   description: string;
   landmark?: string;
   address: Address;
+  photos?: { name?: string; dataUrl?: string }[];
 }) {
   const category = getCategory(input.categoryId);
   if (!category) throw new Error("Unknown complaint category.");
@@ -127,6 +129,7 @@ export async function createServerComplaint(input: {
 
   const createdAt = new Date().toISOString();
   const trackingId = generateTrackingId(input.address.city);
+  const photos = await saveCompressedPhotos(input.photos);
   const complaint: Complaint = {
     id: crypto.randomUUID(),
     trackingId,
@@ -138,7 +141,7 @@ export async function createServerComplaint(input: {
     title: input.title.trim(),
     description: input.description.trim(),
     landmark: input.landmark?.trim() || undefined,
-    photos: [],
+    photos,
     address: input.address,
     civicBodyId: match.body.id,
     civicBodyName: match.body.name,
@@ -162,6 +165,7 @@ export async function createServerComplaint(input: {
     landmark: complaint.landmark,
     address: input.address,
     civicBody: match.body,
+    photoCount: photos.length,
   });
   const dispatch = createDispatch(complaint, match.body, composed);
 

@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import AdSenseScript from "@/components/ads/AdSenseScript";
 import { adsenseConfig, adsenseReady } from "@/config/adsense";
 import { siteConfig } from "@/config/site";
+import { siteUrl } from "@/lib/site-url";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -24,6 +25,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: siteConfig.name,
   description: siteConfig.description,
   ...(adsenseReady()

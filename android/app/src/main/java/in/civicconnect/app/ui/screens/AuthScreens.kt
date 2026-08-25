@@ -34,6 +34,7 @@ import `in`.civicconnect.app.ui.components.CivicField
 import `in`.civicconnect.app.ui.components.CivicHero
 import `in`.civicconnect.app.ui.components.CivicOutlineButton
 import `in`.civicconnect.app.ui.components.ErrorBanner
+import `in`.civicconnect.app.ui.components.LegalLinks
 import `in`.civicconnect.app.ui.components.SoftCard
 import `in`.civicconnect.app.ui.theme.Navy
 import `in`.civicconnect.app.ui.theme.Saffron
@@ -154,6 +155,12 @@ fun RegisterScreen(vm: AppViewModel, onRegistered: (String) -> Unit, onLogin: ()
                 }
                 CivicOutlineButton("Back") { step = 1 }
             }
+            Text(
+                "By creating an account you agree to the Privacy Policy and Terms of Service.",
+                fontSize = 12.sp,
+                color = Navy.copy(alpha = 0.7f)
+            )
+            LegalLinks(vm.serverUrl)
             TextButton(onClick = onLogin) { Text("Already registered? Sign in") }
         }
     }

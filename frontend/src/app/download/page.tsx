@@ -1,4 +1,5 @@
 import { Smartphone, Mail, ShieldCheck, Radio } from "lucide-react";
+import Link from "next/link";
 
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
@@ -104,6 +105,17 @@ export default function DownloadPage() {
             </li>
           </ol>
         </div>
+        <p className="mt-6 text-center text-sm text-slate-500">
+          Installing the app means you agree to the{" "}
+          <Link href="/terms" className="font-semibold text-[var(--saffron)]">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="font-semibold text-[var(--saffron)]">
+            Privacy Policy
+          </Link>
+          .
+        </p>
         <AdSlot slotKey="download" />
       </Container>
     </section>

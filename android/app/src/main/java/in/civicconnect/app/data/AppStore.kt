@@ -134,9 +134,10 @@ class AppStore(context: Context) {
         title: String,
         description: String,
         landmark: String,
-        address: Address
+        address: Address,
+        photos: List<PendingPhoto> = emptyList()
     ): Complaint {
-        val payload = api.createComplaint(categoryId, title, description, landmark, address)
+        val payload = api.createComplaint(categoryId, title, description, landmark, address, photos)
         val complaint = complaintFromPublic(payload.getJSONObject("complaint"))
         payload.optJSONObject("dispatch")?.let {
             val dispatch = dispatchFromPublic(it)

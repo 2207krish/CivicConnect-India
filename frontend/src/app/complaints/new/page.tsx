@@ -16,6 +16,7 @@ import { useAuth } from "@/context/AuthContext";
 import { complaintCategories, getCategory } from "@/data/categories";
 import { CITIES_BY_STATE, INDIAN_STATES, lookupPincode } from "@/data/locations";
 import { apiCreateComplaint } from "@/lib/complaints-client";
+import { compressImageFile, formatBytes, MAX_PHOTOS } from "@/lib/compress-image";
 import { findBestBodyForDepartment } from "@/lib/matching";
 import { complaintSchema, type ComplaintValues } from "@/lib/validators";
 import type { ComplaintPhoto } from "@/types";
@@ -42,6 +43,7 @@ function NewComplaintForm() {
   const searchParams = useSearchParams();
   const [photos, setPhotos] = useState<ComplaintPhoto[]>([]);
   const [formError, setFormError] = useState("");
+  const [compressing, setCompressing] = useState(false);
 
   const {
     register,
@@ -75,20 +77,25 @@ function NewComplaintForm() {
 
   async function onPhotos(files: FileList | null) {
     if (!files) return;
-    const selected = Array.from(files).slice(0, 3);
-    const next: ComplaintPhoto[] = [];
-
-    for (const file of selected) {
-      if (file.size > 2 * 1024 * 1024) {
-        setFormError("Each photo must be under 2 MB.");
-        return;
-      }
-      const dataUrl = await readFile(file);
-      next.push({ name: file.name, dataUrl });
-    }
-
-    setPhotos(next);
+    const selected = Array.from(files).slice(0, MAX_PHOTOS);
+    setCompressing(true);
     setFormError("");
+    try {
+      const next: ComplaintPhoto[] = [];
+      for (const file of selected) {
+        const compressed = await compressImageFile(file);
+        next.push({
+          name: compressed.name,
+          dataUrl: compressed.dataUrl,
+          bytes: compressed.bytes,
+        });
+      }
+      setPhotos(next);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "Could not compress the photos.");
+    } finally {
+      setCompressing(false);
+    }
   }
 
   async function onSubmit(values: ComplaintValues) {
@@ -106,6 +113,9 @@ function NewComplaintForm() {
         landmark: values.landmark,
         useRegisteredAddress: values.useRegisteredAddress,
         address: values.useRegisteredAddress ? user.address : values.address,
+        photos: photos
+          .filter((photo) => photo.dataUrl)
+          .map((photo) => ({ name: photo.name, dataUrl: photo.dataUrl as string })),
       });
       router.push(`/complaints/${complaint.trackingId}`);
     } catch (error) {
@@ -206,7 +216,9 @@ function NewComplaintForm() {
             ) : null}
 
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-700">Photos (optional, up to 3)</span>
+              <span className="text-sm font-medium text-slate-700">
+                Photos (optional, up to {MAX_PHOTOS}, auto-compressed under 200 KB)
+              </span>
               <input
                 type="file"
                 accept="image/*"
@@ -214,22 +226,32 @@ function NewComplaintForm() {
                 onChange={(event) => onPhotos(event.target.files)}
                 className="block w-full text-sm text-slate-600"
               />
+              <span className="block text-xs text-slate-500">
+                Phone photos are reduced before they are saved, so hosting disk stays small.
+              </span>
             </label>
+            {compressing ? (
+              <p className="text-sm text-slate-500">Compressing photos under 200 KB...</p>
+            ) : null}
             {photos.length > 0 ? (
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {photos.map((photo) => (
-                  <img
-                    key={photo.name}
-                    src={photo.dataUrl}
-                    alt={photo.name}
-                    className="h-20 w-20 rounded-lg object-cover"
-                  />
+                  <div key={photo.name} className="w-24">
+                    <img
+                      src={photo.dataUrl}
+                      alt={photo.name}
+                      className="h-20 w-24 rounded-lg object-cover"
+                    />
+                    <p className="mt-1 text-center text-[11px] text-slate-500">
+                      {photo.bytes ? formatBytes(photo.bytes) : "compressed"}
+                    </p>
+                  </div>
                 ))}
               </div>
             ) : null}
 
             {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
-            <Button type="submit" disabled={isSubmitting || !match}>
+            <Button type="submit" disabled={isSubmitting || compressing || !match}>
               {isSubmitting ? "Sending complaint..." : "Email complaint to civic body"}
             </Button>
           </form>
@@ -250,11 +272,3 @@ function NewComplaintForm() {
   );
 }
 
-function readFile(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}

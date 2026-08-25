@@ -31,6 +31,11 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Enter your password"),
 });
 
+export const photoUploadSchema = z.object({
+  name: z.string().min(1).max(120),
+  dataUrl: z.string().min(32).max(500_000),
+});
+
 export const complaintSchema = z.object({
   categoryId: z.string().min(1, "Select a complaint category"),
   title: z.string().min(8, "Give the issue a short title"),
@@ -38,6 +43,7 @@ export const complaintSchema = z.object({
   landmark: z.string().optional(),
   useRegisteredAddress: z.boolean(),
   address: addressSchema,
+  photos: z.array(photoUploadSchema).max(3).optional(),
 });
 
 export const profileSchema = z.object({

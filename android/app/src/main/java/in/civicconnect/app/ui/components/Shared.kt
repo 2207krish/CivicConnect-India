@@ -1,8 +1,11 @@
 package `in`.civicconnect.app.ui.components
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -39,6 +43,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import `in`.civicconnect.app.data.AppConfig
 import `in`.civicconnect.app.data.MatchedCivicBody
 import `in`.civicconnect.app.data.statusLabel
 import `in`.civicconnect.app.ui.theme.Ivory
@@ -226,4 +231,47 @@ fun SoftCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
 @Composable
 fun ScreenBackground(content: @Composable () -> Unit) {
     Box(Modifier.fillMaxSize().background(Ivory)) { content() }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun LegalLinks(baseUrl: String) {
+    val context = LocalContext.current
+    fun open(path: String) {
+        runCatching {
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse(AppConfig.pageUrl(baseUrl, path))).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            )
+        }
+    }
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+    ) {
+        Text(
+            "Privacy Policy",
+            color = Saffron,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.clickable { open("/privacy") }
+        )
+        Text("  ·  ", color = Navy.copy(alpha = 0.5f), fontSize = 13.sp)
+        Text(
+            "Terms of Service",
+            color = Saffron,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.clickable { open("/terms") }
+        )
+        Text("  ·  ", color = Navy.copy(alpha = 0.5f), fontSize = 13.sp)
+        Text(
+            "Civic guide",
+            color = Saffron,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.clickable { open("/learn") }
+        )
+    }
 }

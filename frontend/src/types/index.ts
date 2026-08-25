@@ -77,7 +77,9 @@ export interface TimelineEvent {
 
 export interface ComplaintPhoto {
   name: string;
-  dataUrl: string;
+  url?: string;
+  dataUrl?: string;
+  bytes?: number;
 }
 
 export interface Complaint {

@@ -13,8 +13,13 @@ export const siteConfig = {
     { title: "Home", href: "/" },
     { title: "How it works", href: "/#how-it-works" },
     { title: "Civic bodies", href: "/civic-bodies" },
+    { title: "Civic guide", href: "/learn" },
     { title: "Track", href: "/track" },
     { title: "Get the app", href: "/download" },
     { title: "Contact", href: "/contact" },
+  ],
+  legalItems: [
+    { title: "Privacy Policy", href: "/privacy" },
+    { title: "Terms of Service", href: "/terms" },
   ],
 };

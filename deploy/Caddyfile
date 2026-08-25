@@ -1,0 +1,17 @@
+# CivicConnect India — Caddy reverse proxy
+# Caddy requests a free Let's Encrypt certificate and renews it automatically.
+# Set SITE_DOMAIN and LETSENCRYPT_EMAIL in the environment (see docker-compose.yml).
+
+{
+	email {$LETSENCRYPT_EMAIL}
+}
+
+{$SITE_DOMAIN} {
+	encode gzip zstd
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+	reverse_proxy app:3000
+}

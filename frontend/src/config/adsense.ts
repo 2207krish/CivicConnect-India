@@ -9,6 +9,8 @@ export const adsenseConfig = {
     download: process.env.NEXT_PUBLIC_ADSENSE_SLOT_DOWNLOAD?.trim() || "",
     contact: process.env.NEXT_PUBLIC_ADSENSE_SLOT_CONTACT?.trim() || "",
     complaint: process.env.NEXT_PUBLIC_ADSENSE_SLOT_COMPLAINT?.trim() || "",
+    learnIndex: process.env.NEXT_PUBLIC_ADSENSE_SLOT_LEARN_INDEX?.trim() || "",
+    learnArticle: process.env.NEXT_PUBLIC_ADSENSE_SLOT_LEARN_ARTICLE?.trim() || "",
   },
 };
 

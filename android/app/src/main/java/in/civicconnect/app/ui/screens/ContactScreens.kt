@@ -33,6 +33,7 @@ import `in`.civicconnect.app.ui.components.CivicDropdown
 import `in`.civicconnect.app.ui.components.CivicField
 import `in`.civicconnect.app.ui.components.CivicHero
 import `in`.civicconnect.app.ui.components.ErrorBanner
+import `in`.civicconnect.app.ui.components.LegalLinks
 import `in`.civicconnect.app.ui.components.SoftCard
 import `in`.civicconnect.app.ui.theme.Navy
 import `in`.civicconnect.app.ui.theme.Saffron
@@ -151,6 +152,8 @@ fun ContactScreen(vm: AppViewModel) {
                     }
                 }
             }
+            Spacer(Modifier.height(8.dp))
+            LegalLinks(vm.serverUrl)
         }
     }
 }

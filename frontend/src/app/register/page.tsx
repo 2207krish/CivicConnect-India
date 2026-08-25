@@ -220,6 +220,17 @@ export default function RegisterPage() {
                   {isSubmitting ? "Sending verification token..." : "Register and email token"}
                 </Button>
               </div>
+              <p className="text-xs leading-5 text-slate-500">
+                By creating an account you agree to the{" "}
+                <Link href="/terms" className="font-semibold text-[var(--saffron)]">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" className="font-semibold text-[var(--saffron)]">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
             </>
           )}
         </form>

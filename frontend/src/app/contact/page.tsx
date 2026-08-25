@@ -1,4 +1,5 @@
 import { Mail, Phone, Wrench } from "lucide-react";
+import Link from "next/link";
 
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
@@ -30,6 +31,15 @@ export default function ContactPage() {
           <p className="mt-4 max-w-xl text-slate-600 leading-7">
             For development changes, modifications or bugs in CivicConnect India,
             contact the developer below. You can also send feedback with the form.
+          </p>
+          <p className="mt-3 text-sm text-slate-500">
+            <Link href="/privacy" className="font-semibold text-[var(--saffron)]">
+              Privacy Policy
+            </Link>
+            {" · "}
+            <Link href="/terms" className="font-semibold text-[var(--saffron)]">
+              Terms of Service
+            </Link>
           </p>
 
           <div className="mt-8 space-y-4">

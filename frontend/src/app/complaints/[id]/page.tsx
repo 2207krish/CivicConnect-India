@@ -116,8 +116,8 @@ export default function ComplaintDetailPage() {
               <div className="mt-6 flex gap-3">
                 {complaint.photos.map((photo) => (
                   <img
-                    key={photo.name}
-                    src={photo.dataUrl}
+                    key={photo.url || photo.name}
+                    src={photo.url || photo.dataUrl}
                     alt={photo.name}
                     className="h-24 w-24 rounded-lg object-cover"
                   />

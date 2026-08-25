@@ -41,6 +41,13 @@ export default function Hero() {
             >
               Track a complaint
             </Button>
+            <Button
+              variant="outline"
+              href="/learn"
+              className="border-white/30 bg-white/10 text-white hover:border-amber-300 hover:text-amber-200"
+            >
+              Civic awareness guide
+            </Button>
           </div>
         </div>
 

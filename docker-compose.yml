@@ -1,0 +1,46 @@
+# CivicConnect India — production with free Let's Encrypt SSL (Caddy)
+#
+# 1. Point your domain A record to this server.
+# 2. Copy .env.example to .env and set SITE_DOMAIN + LETSENCRYPT_EMAIL.
+# 3. docker compose up -d
+#
+# Caddy listens on 80/443, obtains the certificate, and proxies to Next.js.
+
+services:
+  app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      NODE_ENV: production
+      FORCE_HTTPS: "true"
+      APP_URL: https://${SITE_DOMAIN}
+    volumes:
+      - civic-data:/app/.data
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  civic-data:
+  caddy-data:
+  caddy-config:

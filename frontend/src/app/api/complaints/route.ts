@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       description: body.description,
       landmark: body.landmark,
       address,
+      photos: body.photos,
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {

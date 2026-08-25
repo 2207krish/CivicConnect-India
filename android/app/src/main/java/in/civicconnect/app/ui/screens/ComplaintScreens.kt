@@ -2,6 +2,8 @@ package `in`.civicconnect.app.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import `in`.civicconnect.app.data.Address
 import `in`.civicconnect.app.data.AppMedia
+import `in`.civicconnect.app.data.ImageCompressor
+import `in`.civicconnect.app.data.PendingPhoto
 import `in`.civicconnect.app.data.categories
 import `in`.civicconnect.app.data.categoryById
 import `in`.civicconnect.app.data.citiesByState
@@ -56,6 +62,9 @@ import `in`.civicconnect.app.ui.components.SoftCard
 import `in`.civicconnect.app.ui.components.StatusChip
 import `in`.civicconnect.app.ui.theme.Navy
 import `in`.civicconnect.app.ui.theme.Saffron
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -77,6 +86,24 @@ fun NewComplaintScreen(vm: AppViewModel, initialCategory: String, onCreated: (St
     var state by remember { mutableStateOf(user.address.state) }
     var pincode by remember { mutableStateOf(user.address.pincode) }
     var localError by remember { mutableStateOf<String?>(null) }
+    var photos by remember { mutableStateOf<List<PendingPhoto>>(emptyList()) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        scope.launch {
+            localError = null
+            val compressed = runCatching {
+                withContext(Dispatchers.IO) {
+                    uris.take(3).map { ImageCompressor.compress(context, it) }
+                }
+            }
+            compressed.fold(
+                onSuccess = { photos = it },
+                onFailure = { localError = it.message }
+            )
+        }
+    }
 
     val address = if (useRegistered) user.address else Address(line1, area, city, state, pincode)
     val category = categoryById(categoryId)
@@ -130,13 +157,34 @@ fun NewComplaintScreen(vm: AppViewModel, initialCategory: String, onCreated: (St
                 Text("This will be emailed to", fontWeight = FontWeight.Bold, color = Navy)
                 CivicBodyMatchCard(it)
             }
+            CivicOutlineButton("Add photos (optional, max 3)") { picker.launch("image/*") }
+            Text(
+                "Photos are compressed under 200 KB before they are stored.",
+                fontSize = 12.sp,
+                color = Navy.copy(alpha = 0.7f)
+            )
+            if (photos.isNotEmpty()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    photos.forEach { photo ->
+                        Column {
+                            AsyncImage(
+                                photo.dataUrl,
+                                contentDescription = photo.name,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(72.dp).clip(RoundedCornerShape(12.dp))
+                            )
+                            Text("${photo.bytes / 1024} KB", fontSize = 11.sp, color = Navy.copy(alpha = 0.7f))
+                        }
+                    }
+                }
+            }
             CivicButton("Submit complaint", enabled = !vm.busy) {
                 localError = when {
                     categoryId.isBlank() -> "Select a complaint category"
                     else -> Validators.title(title) ?: Validators.description(description) ?: Validators.address(address)
                 }
                 if (localError != null) return@CivicButton
-                vm.fileComplaint(categoryId, title, description, landmark, address) { created ->
+                vm.fileComplaint(categoryId, title, description, landmark, address, photos) { created ->
                     if (created != null) onCreated(created.trackingId)
                 }
             }
@@ -172,6 +220,24 @@ fun ComplaintDetailScreen(vm: AppViewModel, trackingId: String, onBack: () -> Un
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(complaint.address.formatted(), fontSize = 13.sp, color = Color(0xFF475569))
+                if (complaint.photos.isNotEmpty()) {
+                    Spacer(Modifier.height(10.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        complaint.photos.forEach { photo ->
+                            val src = if (photo.url.startsWith("http") || photo.url.startsWith("data:")) {
+                                photo.url
+                            } else {
+                                vm.serverUrl.trimEnd('/') + photo.url
+                            }
+                            AsyncImage(
+                                src,
+                                contentDescription = photo.name,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(88.dp).clip(RoundedCornerShape(12.dp))
+                            )
+                        }
+                    }
+                }
             }
             SoftCard {
                 Text("Assigned civic body", fontWeight = FontWeight.Bold, color = Navy)

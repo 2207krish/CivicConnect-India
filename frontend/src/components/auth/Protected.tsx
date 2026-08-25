@@ -1,10 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Protected({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[50vh] items-center justify-center text-sm text-slate-500">
+          Loading your account...
+        </div>
+      }
+    >
+      <ProtectedGate>{children}</ProtectedGate>
+    </Suspense>
+  );
+}
+
+function ProtectedGate({ children }: { children: React.ReactNode }) {
   const { user, ready } = useAuth();
   const router = useRouter();
   const pathname = usePathname();

@@ -31,6 +31,11 @@ const faqs = [
     answer:
       "Yes. Use citizen@demo.in with password Demo@123. It is preloaded with a New Delhi address and sample complaints.",
   },
+  {
+    question: "Where can I learn about civic rights and city budgets?",
+    answer:
+      "Open the Civic guide. It has long-form articles on municipal finance, the 74th Amendment, RTI for civic works, and how to escalate a stalled complaint to the next authority.",
+  },
 ];
 
 export default function FAQ() {

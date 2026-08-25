@@ -1,8 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["nodemailer"],
+  serverExternalPackages: ["nodemailer", "sharp"],
   async headers() {
+    const security =
+      process.env.FORCE_HTTPS === "true"
+        ? [
+            {
+              key: "Strict-Transport-Security",
+              value: "max-age=31536000; includeSubDomains",
+            },
+          ]
+        : [];
     return [
       {
         source: "/downloads/:path*",
@@ -14,6 +23,9 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      ...(security.length
+        ? [{ source: "/:path*", headers: security }]
+        : []),
     ];
   },
   images: {

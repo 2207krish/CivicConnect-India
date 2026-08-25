@@ -10,6 +10,7 @@ import `in`.civicconnect.app.data.Address
 import `in`.civicconnect.app.data.AppStore
 import `in`.civicconnect.app.data.Complaint
 import `in`.civicconnect.app.data.PendingOtp
+import `in`.civicconnect.app.data.PendingPhoto
 import `in`.civicconnect.app.data.UnverifiedException
 import `in`.civicconnect.app.data.User
 import kotlinx.coroutines.Dispatchers
@@ -234,6 +235,7 @@ class AppViewModel(private val store: AppStore) : ViewModel() {
         description: String,
         landmark: String,
         address: Address,
+        photos: List<PendingPhoto> = emptyList(),
         onDone: (Complaint?) -> Unit
     ) {
         viewModelScope.launch {
@@ -241,7 +243,7 @@ class AppViewModel(private val store: AppStore) : ViewModel() {
             error = null
             val created = runCatching {
                 withContext(Dispatchers.IO) {
-                    store.createComplaint(categoryId, title, description, landmark, address)
+                    store.createComplaint(categoryId, title, description, landmark, address, photos)
                 }
             }.onFailure {
                 error = it.message

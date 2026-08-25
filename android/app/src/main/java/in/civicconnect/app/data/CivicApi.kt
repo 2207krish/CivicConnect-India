@@ -110,8 +110,17 @@ class CivicApi(private val prefs: SharedPreferences) {
         title: String,
         description: String,
         landmark: String,
-        address: Address
+        address: Address,
+        photos: List<PendingPhoto> = emptyList()
     ): JSONObject {
+        val photoArray = JSONArray()
+        photos.forEach { photo ->
+            photoArray.put(
+                JSONObject()
+                    .put("name", photo.name)
+                    .put("dataUrl", photo.dataUrl)
+            )
+        }
         return request(
             "POST",
             "/api/complaints",
@@ -122,6 +131,7 @@ class CivicApi(private val prefs: SharedPreferences) {
                 .put("landmark", landmark)
                 .put("useRegisteredAddress", false)
                 .put("address", address.toApiJson())
+                .put("photos", photoArray)
         )
     }
 
@@ -158,7 +168,7 @@ class CivicApi(private val prefs: SharedPreferences) {
         val conn = (url.openConnection() as HttpURLConnection).apply {
             requestMethod = method
             connectTimeout = 15000
-            readTimeout = 20000
+            readTimeout = 40000
             setRequestProperty("Accept", "application/json")
             setRequestProperty("Content-Type", "application/json")
             if (auth) token?.let { setRequestProperty("Authorization", "Bearer $it") }
@@ -236,8 +246,21 @@ fun complaintFromPublic(obj: JSONObject): Complaint {
             TimelineEvent(item.getString("status"), parseTime(item.getString("at")), item.getString("note"))
         },
         parseTime(obj.getString("createdAt")),
-        parseTime(obj.getString("updatedAt"))
+        parseTime(obj.getString("updatedAt")),
+        photosFromPublic(obj)
     )
+}
+
+fun photosFromPublic(obj: JSONObject): List<ComplaintPhoto> {
+    val photos = obj.optJSONArray("photos") ?: return emptyList()
+    return List(photos.length()) {
+        val item = photos.getJSONObject(it)
+        ComplaintPhoto(
+            item.optString("name", "photo.jpg"),
+            item.optString("url").ifBlank { item.optString("dataUrl") },
+            item.optInt("bytes")
+        )
+    }
 }
 
 fun dispatchFromPublic(obj: JSONObject) = EmailDispatch(

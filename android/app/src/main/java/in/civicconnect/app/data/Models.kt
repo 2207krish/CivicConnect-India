@@ -55,6 +55,12 @@ data class TimelineEvent(
     val note: String
 )
 
+data class ComplaintPhoto(
+    val name: String,
+    val url: String,
+    val bytes: Int = 0
+)
+
 data class Complaint(
     val id: String,
     val trackingId: String,
@@ -73,7 +79,8 @@ data class Complaint(
     val status: String,
     val timeline: List<TimelineEvent>,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val photos: List<ComplaintPhoto> = emptyList()
 )
 
 data class EmailDispatch(

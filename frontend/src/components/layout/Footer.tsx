@@ -12,7 +12,10 @@ const footerLinks = [
   { title: "File a complaint", href: "/complaints/new" },
   { title: "Track complaint", href: "/track" },
   { title: "Civic bodies", href: "/civic-bodies" },
+  { title: "Civic awareness guide", href: "/learn" },
   { title: "Contact & feedback", href: "/contact" },
+  { title: "Privacy Policy", href: "/privacy" },
+  { title: "Terms of Service", href: "/terms" },
 ];
 
 export default function Footer() {
@@ -93,8 +96,15 @@ export default function Footer() {
       </Container>
 
       <div className="relative border-t border-white/10">
-        <Container className="py-4 text-xs text-slate-400">
-          © {new Date().getFullYear()} CivicConnect India. Built for citizen grievance routing.
+        <Container className="flex flex-wrap items-center justify-between gap-3 py-4 text-xs text-slate-400">
+          <p>© {new Date().getFullYear()} CivicConnect India. Built for citizen grievance routing.</p>
+          <p className="flex flex-wrap gap-4">
+            {siteConfig.legalItems.map((item) => (
+              <Link key={item.href} href={item.href} className="hover:text-amber-200">
+                {item.title}
+              </Link>
+            ))}
+          </p>
         </Container>
       </div>
     </footer>

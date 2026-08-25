@@ -19,6 +19,7 @@ export async function apiCreateComplaint(input: {
   landmark?: string;
   useRegisteredAddress: boolean;
   address: Address;
+  photos?: { name: string; dataUrl: string }[];
 }) {
   return parse<{ ok: true; complaint: Complaint; dispatch: EmailDispatch }>(
     await fetch("/api/complaints", {
