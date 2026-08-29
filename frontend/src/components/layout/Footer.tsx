@@ -1,4 +1,4 @@
-import { Mail, Phone, Wrench } from "lucide-react";
+import { Mail, Wrench } from "lucide-react";
 import Link from "next/link";
 
 import Container from "./Container";
@@ -70,12 +70,6 @@ export default function Footer() {
             <Mail className="h-4 w-4 text-amber-300" />
             <a href={`mailto:${developer.email}`} className="hover:text-amber-200">
               {developer.email}
-            </a>
-          </p>
-          <p className="mt-2 flex items-center gap-2 text-sm">
-            <Phone className="h-4 w-4 text-amber-300" />
-            <a href={`tel:${developer.phone}`} className="hover:text-amber-200">
-              {developer.phoneDisplay}
             </a>
           </p>
           <Link

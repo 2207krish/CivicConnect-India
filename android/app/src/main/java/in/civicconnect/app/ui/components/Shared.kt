@@ -2,15 +2,22 @@ package `in`.civicconnect.app.ui.components
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -36,6 +43,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -43,6 +51,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import `in`.civicconnect.app.R
 import `in`.civicconnect.app.data.AppConfig
 import `in`.civicconnect.app.data.MatchedCivicBody
 import `in`.civicconnect.app.data.statusLabel
@@ -65,7 +74,15 @@ fun CivicHero(image: String, title: String, subtitle: String, modifier: Modifier
                 .background(Brush.verticalGradient(listOf(Color.Transparent, Navy.copy(alpha = 0.88f))))
         )
         Column(Modifier.align(Alignment.BottomStart).padding(20.dp)) {
-            Text("CIVICCONNECT INDIA", color = Color(0xFFF4C57A), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = "CivicConnect India",
+                    modifier = Modifier.size(36.dp).clip(CircleShape)
+                )
+                Spacer(Modifier.width(10.dp))
+                Text("CIVICCONNECT INDIA", color = Color(0xFFF4C57A), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            }
             Spacer(Modifier.height(6.dp))
             Text(title, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold, lineHeight = 32.sp)
             Spacer(Modifier.height(6.dp))

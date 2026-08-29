@@ -47,6 +47,8 @@ interface AuthContextValue {
     phone: string;
     address: Address;
   }) => Promise<PublicUser>;
+  /** Re-fetch the current session user (used after OAuth sign-in). */
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -98,6 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const result = await apiUpdateProfile(patch);
         setUser(result.user);
         return result.user;
+      },
+      async refreshUser() {
+        const current = await apiMe().catch(() => null);
+        setUser(current);
       },
     }),
     [ready, user]

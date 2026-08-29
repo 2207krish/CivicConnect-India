@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -13,13 +13,20 @@ import Select from "@/components/ui/Select";
 import { civicImages } from "@/config/media";
 import { useAuth } from "@/context/AuthContext";
 import { CITIES_BY_STATE, INDIAN_STATES, lookupPincode } from "@/data/locations";
+import { apiGoogleLogin } from "@/lib/auth-client";
+import { renderGoogleButton } from "@/lib/google-auth";
 import { registerSchema, type RegisterValues } from "@/lib/validators";
+
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register: registerUser } = useAuth();
+  const { register: registerUser, refreshUser } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
   const [formError, setFormError] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
+  const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   const {
     register,
@@ -48,6 +55,32 @@ export default function RegisterPage() {
 
   const selectedState = watch("address.state");
   const cities = CITIES_BY_STATE[selectedState] ?? [];
+
+  // Mount the Google button
+  useEffect(() => {
+    if (!CLIENT_ID || !googleBtnRef.current) return;
+    renderGoogleButton(
+      googleBtnRef.current,
+      CLIENT_ID,
+      handleGoogleToken,
+      (error) => setFormError(error.message)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [CLIENT_ID]);
+
+  async function handleGoogleToken(idToken: string) {
+    setFormError("");
+    setGoogleLoading(true);
+    try {
+      await apiGoogleLogin(idToken);
+      await refreshUser();
+      router.push("/dashboard");
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "Google sign-in failed.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
 
   async function goToAddress() {
     const valid = await trigger(["name", "email", "phone", "password", "confirmPassword"]);
@@ -98,6 +131,23 @@ export default function RegisterPage() {
         emailed to you. The portal stays locked until that token is verified.
       </p>
 
+      {/* Google Sign-In — one click, no email verification needed */}
+      {CLIENT_ID && (
+        <div className="mt-6 space-y-3 rounded-[28px] border border-[#e5dccb] bg-white p-6 shadow-[0_20px_50px_rgba(20,32,51,0.08)]">
+          <p className="text-sm font-medium text-slate-700">Fastest way to get started</p>
+          <div
+            ref={googleBtnRef}
+            id="google-register-btn"
+            className="flex w-full items-center justify-center"
+            aria-label="Continue with Google"
+          />
+          {googleLoading && (
+            <p className="text-center text-sm text-slate-500">Creating your account…</p>
+          )}
+          {formError && <p className="text-sm text-red-600">{formError}</p>}
+        </div>
+      )}
+
       <div className="mt-6 flex flex-wrap gap-3 text-sm">
         <span className={step === 1 ? "font-semibold text-[var(--saffron)]" : "text-slate-500"}>
           1. Personal details
@@ -109,6 +159,10 @@ export default function RegisterPage() {
         <span className="text-slate-300">/</span>
         <span className="text-slate-500">3. Email token</span>
       </div>
+
+      <p className="mt-2 text-xs text-slate-400">
+        — or fill in the form below to register with email
+      </p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}

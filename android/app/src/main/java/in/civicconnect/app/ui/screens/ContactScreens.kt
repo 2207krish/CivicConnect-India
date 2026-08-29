@@ -92,19 +92,6 @@ fun ContactScreen(vm: AppViewModel) {
                         }
                     }
                 )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    AppConfig.developerPhoneDisplay,
-                    color = Saffron,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable {
-                        runCatching {
-                            context.startActivity(
-                                Intent(Intent.ACTION_DIAL, Uri.parse("tel:${AppConfig.developerPhone}"))
-                            )
-                        }
-                    }
-                )
             }
 
             Text("Send feedback", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Navy)

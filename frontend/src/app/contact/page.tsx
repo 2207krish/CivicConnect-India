@@ -1,4 +1,4 @@
-import { Mail, Phone, Wrench } from "lucide-react";
+import { Mail, Wrench } from "lucide-react";
 import Link from "next/link";
 
 import Container from "@/components/layout/Container";
@@ -53,12 +53,6 @@ export default function ContactPage() {
                 <Mail className="h-4 w-4 text-[var(--saffron)]" />
                 <a href={`mailto:${developer.email}`} className="hover:text-[var(--saffron)]">
                   {developer.email}
-                </a>
-              </p>
-              <p className="mt-3 flex items-center gap-3 text-slate-700">
-                <Phone className="h-4 w-4 text-[var(--saffron)]" />
-                <a href={`tel:${developer.phone}`} className="hover:text-[var(--saffron)]">
-                  {developer.phoneDisplay}
                 </a>
               </p>
             </div>

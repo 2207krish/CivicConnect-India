@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["nodemailer", "sharp"],
+  output: "standalone",
+  serverExternalPackages: ["sharp"],
   async headers() {
     const security =
       process.env.FORCE_HTTPS === "true"
@@ -33,6 +34,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        // Google profile pictures (for OAuth users)
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
         pathname: "/**",
       },
     ],

@@ -19,6 +19,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // OAuth-only accounts have no password — direct them to use Google sign-in
+    if (!stored.salt || !stored.passwordHash) {
+      return NextResponse.json(
+        { error: "This account was created with Google. Please use 'Continue with Google' to sign in." },
+        { status: 401 }
+      );
+    }
+
     const valid = await verifyPassword(body.password, stored.salt, stored.passwordHash);
     if (!valid) {
       return NextResponse.json(
@@ -26,6 +34,7 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+
 
     if (!stored.emailVerified) {
       return NextResponse.json(

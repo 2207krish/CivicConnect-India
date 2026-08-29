@@ -146,7 +146,7 @@ export default function TermsOfServicePage() {
           <a className="font-semibold text-[var(--saffron)]" href={`mailto:${developer.email}`}>
             {developer.email}
           </a>
-          , {developer.phoneDisplay}. Feedback and bugs:{" "}
+          . Feedback and bugs:{" "}
           <LegalLink href="/contact">Contact</LegalLink>.
         </p>
       </LegalSection>

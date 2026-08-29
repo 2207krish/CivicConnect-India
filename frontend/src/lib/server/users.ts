@@ -67,6 +67,60 @@ export async function createUnverifiedUser(input: {
   return toPublicUser(user);
 }
 
+export async function findUserByGoogleId(googleId: string) {
+  const users = await listUsers();
+  return users.find((user) => user.googleId === googleId) ?? null;
+}
+
+export async function createOAuthUser(input: {
+  name: string;
+  email: string;
+  googleId: string;
+  picture?: string;
+}) {
+  const defaultAddress: Address = {
+    line1: "",
+    area: "",
+    city: "",
+    state: "",
+    pincode: "",
+  };
+  const user: StoredUser = {
+    id: crypto.randomUUID(),
+    name: input.name.trim(),
+    email: input.email.trim().toLowerCase(),
+    phone: "",
+    address: defaultAddress,
+    nearestBodyIds: [],
+    emailVerified: true, // Google accounts are pre-verified
+    createdAt: new Date().toISOString(),
+    googleId: input.googleId,
+    picture: input.picture,
+    // No salt/passwordHash for OAuth-only accounts
+  };
+
+  await mutateUsers((users) => [...users, user]);
+  return toPublicUser(user);
+}
+
+export async function linkGoogleAccount(
+  userId: string,
+  googleId: string,
+  picture?: string
+) {
+  let updated: StoredUser | null = null;
+  await mutateUsers((users) =>
+    users.map((user) => {
+      if (user.id !== userId) return user;
+      updated = { ...user, googleId, picture: picture ?? user.picture };
+      return updated;
+    })
+  );
+  if (!updated) throw new Error("Account not found.");
+  return toPublicUser(updated!);
+}
+
+
 export async function markUserEmailVerified(email: string) {
   let updated: StoredUser | null = null;
   await mutateUsers((users) =>

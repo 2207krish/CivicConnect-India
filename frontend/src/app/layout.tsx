@@ -28,6 +28,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: siteConfig.name,
   description: siteConfig.description,
+  icons: {
+    icon: "/logo.png",
+    apple: "/apple-icon.png",
+  },
   ...(adsenseReady()
     ? { other: { "google-adsense-account": adsenseConfig.client } }
     : {}),

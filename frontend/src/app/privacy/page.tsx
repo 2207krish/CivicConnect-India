@@ -33,10 +33,6 @@ export default function PrivacyPolicyPage() {
           <a className="font-semibold text-[var(--saffron)]" href={`mailto:${developer.email}`}>
             {developer.email}
           </a>
-          {" · "}
-          <a className="font-semibold text-[var(--saffron)]" href={`tel:${developer.phone}`}>
-            {developer.phoneDisplay}
-          </a>
           . See also our <LegalLink href="/contact">Contact</LegalLink> page.
         </p>
       </LegalSection>

@@ -177,7 +177,6 @@ fun ProfileScreen(vm: AppViewModel, onLoggedOut: () -> Unit, onContact: () -> Un
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(AppConfig.developerEmail, color = Saffron)
-                Text(AppConfig.developerPhoneDisplay, color = Saffron)
                 Spacer(Modifier.height(8.dp))
                 Text("Open contact & feedback form", fontWeight = FontWeight.SemiBold, color = Navy)
             }

@@ -1,0 +1,13 @@
+[build]
+# Railway will detect the Dockerfile in ./frontend automatically.
+# Set the root directory to frontend/ in the Railway dashboard
+# (Service → Settings → Root Directory → frontend)
+dockerfilePath = "Dockerfile"
+watchPatterns = ["src/**", "public/**", "package.json", "next.config.ts", "Dockerfile"]
+
+[deploy]
+startCommand = "node server.js"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

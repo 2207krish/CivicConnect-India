@@ -161,4 +161,15 @@ export async function apiUpdateProfile(input: {
   );
 }
 
+export async function apiGoogleLogin(idToken: string) {
+  return parseResponse<{ ok: true; user: PublicUser }>(
+    await fetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken }),
+    })
+  );
+}
+
+
 export { AuthApiError };

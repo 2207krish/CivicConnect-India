@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 interface SendMailInput {
   to: string;
@@ -7,65 +7,35 @@ interface SendMailInput {
   html: string;
 }
 
-function smtpConfigured() {
-  return Boolean(
-    process.env.SMTP_HOST?.trim() &&
-      process.env.SMTP_USER?.trim() &&
-      process.env.SMTP_PASS?.trim()
-  );
+function resendConfigured() {
+  return Boolean(process.env.RESEND_API_KEY?.trim());
 }
 
-function smtpErrorMessage(error: unknown) {
-  const raw = error instanceof Error ? error.message : "SMTP send failed.";
-  if (/invalid login|eauth|username and password/i.test(raw)) {
-    return "Gmail rejected the SMTP login. Use a 16-character App Password, not your normal Gmail password.";
-  }
-  if (/self signed|certificate/i.test(raw)) {
-    return "SMTP TLS certificate was rejected. Check SMTP_HOST and SMTP_PORT.";
-  }
-  if (/connection timeout|econnrefused|enotfound/i.test(raw)) {
-    return "Could not reach the SMTP server. Check SMTP_HOST, SMTP_PORT, and your internet connection.";
-  }
-  return raw;
-}
-
-function createSmtpTransport() {
-  if (!smtpConfigured()) {
+function getResend() {
+  if (!resendConfigured()) {
     throw new Error(
-      "SMTP_USER and SMTP_PASS are still empty in frontend/.env.local. Put your Gmail address and a 16-character Google App Password there, save the file, and restart the site."
+      "RESEND_API_KEY is not set. Add it to your .env.local (or Railway environment variables) to enable email sending."
     );
   }
-
-  const port = Number(process.env.SMTP_PORT || 587);
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure: port === 465,
-    requireTLS: port === 587,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  return new Resend(process.env.RESEND_API_KEY);
 }
 
 export async function sendMail(input: SendMailInput) {
-  const transporter = createSmtpTransport();
+  const resend = getResend();
   const from =
-    process.env.SMTP_FROM ||
-    `CivicConnect India <${process.env.SMTP_USER}>`;
+    process.env.RESEND_FROM ||
+    "CivicConnect India <onboarding@resend.dev>";
 
-  try {
-    await transporter.sendMail({
-      from,
-      to: input.to,
-      replyTo: process.env.SMTP_USER,
-      subject: input.subject,
-      text: input.text,
-      html: input.html,
-    });
-  } catch (error) {
-    throw new Error(smtpErrorMessage(error));
+  const { error } = await resend.emails.send({
+    from,
+    to: input.to,
+    subject: input.subject,
+    text: input.text,
+    html: input.html,
+  });
+
+  if (error) {
+    throw new Error(`Resend error: ${error.message}`);
   }
 
   return {
@@ -75,7 +45,7 @@ export async function sendMail(input: SendMailInput) {
 }
 
 export function isSmtpConfigured() {
-  return smtpConfigured();
+  return resendConfigured();
 }
 
 export function appUrl(request?: Request) {

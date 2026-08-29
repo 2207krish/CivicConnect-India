@@ -54,11 +54,17 @@ export interface PublicUser {
   nearestBodyIds: string[];
   emailVerified: boolean;
   createdAt: string;
+  /** Set when account was created or linked via Google OAuth */
+  googleId?: string;
+  /** Google profile picture URL */
+  picture?: string;
 }
 
 export interface StoredUser extends PublicUser {
-  salt: string;
-  passwordHash: string;
+  /** Undefined for OAuth-only accounts (no password set) */
+  salt?: string;
+  /** Undefined for OAuth-only accounts (no password set) */
+  passwordHash?: string;
 }
 
 export type ComplaintStatus =
