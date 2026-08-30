@@ -1,5 +1,7 @@
 export const adsenseConfig = {
-  client: process.env.NEXT_PUBLIC_ADSENSE_CLIENT?.trim() || "",
+  client:
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT?.trim() ||
+    "ca-pub-2068627560078285",
   slots: {
     homeTop: process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP?.trim() || "",
     homeMid: process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID?.trim() || "",

@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     icon: "/logo.png",
     apple: "/apple-icon.png",
   },
-  ...(adsenseReady()
-    ? { other: { "google-adsense-account": adsenseConfig.client } }
-    : {}),
+  other: {
+    "google-adsense-account": adsenseConfig.client || "ca-pub-2068627560078285",
+  },
 };
 
 export default function RootLayout({
