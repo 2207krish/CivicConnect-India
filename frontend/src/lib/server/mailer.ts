@@ -59,6 +59,9 @@ export function appUrl(request?: Request) {
     return `http://${host}`;
   }
 
-  const configured = process.env.APP_URL?.trim().replace(/\/$/, "");
+  let configured = process.env.APP_URL?.trim().replace(/\/$/, "");
+  if (configured && !/^https?:\/\//i.test(configured)) {
+    configured = `https://${configured}`;
+  }
   return configured || origin || "http://localhost:3000";
 }
