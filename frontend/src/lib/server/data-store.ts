@@ -1,7 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "fs/promises";
 import path from "path";
 
-const dataDir = path.join(process.cwd(), ".data");
+const dataDir = process.env.DATA_DIR?.trim() || path.join(process.cwd(), ".data");
 let queue: Promise<unknown> = Promise.resolve();
 
 function withLock<T>(work: () => Promise<T>) {
@@ -14,7 +14,11 @@ function withLock<T>(work: () => Promise<T>) {
 }
 
 async function ensureDir() {
-  await mkdir(dataDir, { recursive: true });
+  try {
+    await mkdir(dataDir, { recursive: true, mode: 0o777 });
+  } catch {
+    // Already exists or handled
+  }
 }
 
 export function dataPath(fileName: string) {
