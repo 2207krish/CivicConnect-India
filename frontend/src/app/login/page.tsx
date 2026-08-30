@@ -48,8 +48,20 @@ function LoginForm() {
   const [formError, setFormError] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
   const googleBtnRef = useRef<HTMLDivElement>(null);
+  const [clientId, setClientId] = useState(
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""
+  );
 
-  const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  // Fetch client ID at runtime if not inlined during build (e.g. on Railway/Docker)
+  useEffect(() => {
+    if (clientId) return;
+    fetch("/api/auth/config")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.googleClientId) setClientId(data.googleClientId);
+      })
+      .catch(() => undefined);
+  }, [clientId]);
 
   const {
     register,
@@ -62,16 +74,16 @@ function LoginForm() {
 
   // Mount the Google button once the component is ready
   useEffect(() => {
-    if (!CLIENT_ID || !googleBtnRef.current || step !== "credentials") return;
+    if (!clientId || !googleBtnRef.current || step !== "credentials") return;
 
     renderGoogleButton(
       googleBtnRef.current,
-      CLIENT_ID,
+      clientId,
       handleGoogleToken,
       (error) => setFormError(error.message)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [CLIENT_ID, step]);
+  }, [clientId, step]);
 
   // Countdown timer for OTP resend
   useEffect(() => {
@@ -290,7 +302,7 @@ function LoginForm() {
         /* Step 1: Email & Password Card */
         <div className="mt-8 space-y-5 rounded-[28px] border border-[#e5dccb] bg-white p-6 shadow-[0_20px_50px_rgba(20,32,51,0.08)]">
           {/* Google Sign-In Button */}
-          {CLIENT_ID && (
+          {clientId && (
             <div className="space-y-3">
               <div
                 ref={googleBtnRef}

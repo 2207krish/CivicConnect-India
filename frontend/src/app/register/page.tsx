@@ -27,7 +27,20 @@ export default function RegisterPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const googleBtnRef = useRef<HTMLDivElement>(null);
 
-  const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const [clientId, setClientId] = useState(
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""
+  );
+
+  // Fetch client ID at runtime if not inlined during build (e.g. on Railway/Docker)
+  useEffect(() => {
+    if (clientId) return;
+    fetch("/api/auth/config")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.googleClientId) setClientId(data.googleClientId);
+      })
+      .catch(() => undefined);
+  }, [clientId]);
 
   const {
     register,
@@ -59,15 +72,15 @@ export default function RegisterPage() {
 
   // Mount the Google button
   useEffect(() => {
-    if (!CLIENT_ID || !googleBtnRef.current) return;
+    if (!clientId || !googleBtnRef.current) return;
     renderGoogleButton(
       googleBtnRef.current,
-      CLIENT_ID,
+      clientId,
       handleGoogleToken,
       (error) => setFormError(error.message)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [CLIENT_ID]);
+  }, [clientId]);
 
   async function handleGoogleToken(idToken: string) {
     setFormError("");
@@ -137,7 +150,7 @@ export default function RegisterPage() {
       </p>
 
       {/* Google Sign-In — one click, no email verification needed */}
-      {CLIENT_ID && (
+      {clientId && (
         <div className="mt-6 space-y-3 rounded-[28px] border border-[#e5dccb] bg-white p-6 shadow-[0_20px_50px_rgba(20,32,51,0.08)]">
           <p className="text-sm font-medium text-slate-700">Fastest way to get started</p>
           <div
