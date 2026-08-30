@@ -16,6 +16,7 @@ export default function Logo({ light = false }: { light?: boolean }) {
         height={44}
         className="h-9 w-9 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-[var(--saffron)]/30 shadow-sm shrink-0"
         priority
+        unoptimized
       />
       <div className="flex flex-col leading-none">
         <span

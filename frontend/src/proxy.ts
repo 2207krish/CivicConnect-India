@@ -10,6 +10,15 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const pathname = request.nextUrl.pathname;
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    /\.(png|jpg|jpeg|gif|svg|ico|webp|txt|xml|json)$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
   const proto = request.headers.get("x-forwarded-proto");
   const host = request.headers.get("host") || request.nextUrl.host;
 
@@ -33,5 +42,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
 };
