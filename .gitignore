@@ -1,7 +1,9 @@
 node_modules/
-.env
-.env.local
+.DS_Store
+.env*
+!.env.example
 .data/
+frontend/.data/
 android/.gradle/
 android/build/
 android/app/build/

@@ -14,10 +14,7 @@ function toPublicUser(user: StoredUser): PublicUser {
 
 async function mutateUsers(updater: (users: StoredUser[]) => StoredUser[] | Promise<StoredUser[]>) {
   return updateStore<StoredUser[]>(FILE, [], async (users) => {
-    const seeded = users.some((user) => user.email === "citizen@demo.in")
-      ? users
-      : [await createDemoUser(), ...users];
-    return updater(seeded);
+    return updater(users);
   });
 }
 
@@ -177,26 +174,17 @@ export async function updateUserProfile(
   return toPublicUser(updated);
 }
 
-async function createDemoUser(): Promise<StoredUser> {
-  const address: Address = {
-    line1: "14, Barakhamba Road",
-    area: "Connaught Place",
-    city: "New Delhi",
-    state: "Delhi",
-    pincode: "110001",
-  };
-  const salt = "demodemo1234salt";
-
-  return {
-    id: "demo-anita-sharma",
-    name: "Anita Sharma",
-    email: "citizen@demo.in",
-    phone: "9876543210",
-    address,
-    nearestBodyIds: assignHomeCivicBodies(address).map((item) => item.body.id),
-    emailVerified: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
-    salt,
-    passwordHash: await hashPassword("Demo@123", salt),
-  };
+export async function rehashUserPassword(
+  userId: string,
+  newSalt: string,
+  newHash: string
+) {
+  await mutateUsers((users) =>
+    users.map((user) => {
+      if (user.id !== userId) return user;
+      return { ...user, salt: newSalt, passwordHash: newHash };
+    })
+  );
 }
+
+

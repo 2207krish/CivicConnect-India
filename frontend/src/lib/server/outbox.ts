@@ -8,7 +8,7 @@ export interface OutboxMessage {
   text: string;
   html: string;
   otp: string;
-  verifyUrl: string;
+  verifyUrl: string | null;
   previewUrl: string | null;
   sentAt: string;
   delivery: "preview" | "smtp";

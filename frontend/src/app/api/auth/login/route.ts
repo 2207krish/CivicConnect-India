@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { loginSchema } from "@/lib/validators";
-import { verifyPassword } from "@/lib/hash";
+import { verifyPassword, isLegacyHash, hashPassword, createSalt } from "@/lib/hash";
 import { setSessionCookie } from "@/lib/server/cookies";
 import { createSession } from "@/lib/server/sessions";
 import { publicError } from "@/lib/server/public-error";
-import { asPublicUser, findUserByEmail } from "@/lib/server/users";
+import { asPublicUser, findUserByEmail, rehashUserPassword } from "@/lib/server/users";
+import { issueLoginOtp, verifyLoginOtp } from "@/lib/server/login-otp";
 
 export const runtime = "nodejs";
 
@@ -35,7 +36,6 @@ export async function POST(request: Request) {
       );
     }
 
-
     if (!stored.emailVerified) {
       return NextResponse.json(
         {
@@ -45,6 +45,30 @@ export async function POST(request: Request) {
         },
         { status: 403 }
       );
+    }
+
+    // If OTP is not provided, send OTP to user email and request verification
+    if (!body.otp || body.otp.trim() === "") {
+      await issueLoginOtp(stored.email, stored.name);
+      return NextResponse.json({
+        ok: true,
+        requiresOtp: true,
+        email: stored.email,
+        message: `A 6-digit login OTP has been sent to ${stored.email}.`,
+      });
+    }
+
+    // Verify the provided OTP
+    await verifyLoginOtp(stored.email, body.otp);
+
+    // Transparently upgrade legacy SHA-256 hashes to PBKDF2
+    if (stored.passwordHash && isLegacyHash(stored.passwordHash)) {
+      const newSalt = createSalt();
+      const newHash = await hashPassword(body.password, newSalt);
+      await rehashUserPassword(stored.id, newSalt, newHash).catch(() => {
+        // Non-critical — log but don't block login
+        console.warn("[auth] Failed to re-hash legacy password for", stored.email);
+      });
     }
 
     const token = await createSession(stored.id);

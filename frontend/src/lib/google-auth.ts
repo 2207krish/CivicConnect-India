@@ -121,7 +121,7 @@ export async function renderGoogleButton(
   window.google.accounts.id.renderButton(container, {
     theme: "outline",
     size: "large",
-    width: "100%",
+    width: 340,
     text: "continue_with",
     shape: "rectangular",
   });

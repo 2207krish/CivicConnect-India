@@ -36,9 +36,9 @@ const faqs = [
       "Yes. Open Track and enter the CivicConnect ID printed on your acknowledgement, for example CCI-NEW-20260823-ROAD.",
   },
   {
-    question: "Is there a demo account?",
+    question: "Can I sign in with Google?",
     answer:
-      "Yes. Use citizen@demo.in with password Demo@123. It is preloaded with a New Delhi address and sample complaints.",
+      "Yes. Click 'Continue with Google' on the login or register page. Your Google email is verified automatically, so you can start filing complaints right away.",
   },
   {
     question: "Where can I learn about civic rights and city budgets?",

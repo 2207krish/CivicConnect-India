@@ -35,8 +35,7 @@ export default function TermsOfServicePage() {
         <p>
           You must be at least 18 years old and able to enter a contract under
           Indian law. You must provide a real name, working email, mobile
-          number and residential address. Demo credentials on the site are only
-          for trying the interface.
+          number and residential address.
         </p>
       </LegalSection>
 

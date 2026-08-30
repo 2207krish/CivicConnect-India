@@ -1,9 +1,9 @@
 import { getCategory } from "@/data/categories";
-import { getCivicBodyById } from "@/data/civic-bodies";
 import { composeComplaintEmail, createDispatch } from "@/lib/email";
 import { findBestBodyForDepartment } from "@/lib/matching";
 import { saveCompressedPhotos } from "@/lib/server/compress-image";
 import { updateStore } from "@/lib/server/data-store";
+import { isSmtpConfigured, sendMail } from "@/lib/server/mailer";
 import { generateTrackingId, refreshComplaintStatus } from "@/lib/status";
 import type { Address, Complaint, EmailDispatch, PublicUser } from "@/types";
 
@@ -19,81 +19,14 @@ async function mutateComplaints(updater: (store: ComplaintStore) => ComplaintSto
     FILE,
     { complaints: [], dispatches: [] },
     async (store) => {
-      const seeded = store.complaints.some((item) => item.trackingId === "CCI-NEW-20260823-ROAD")
-        ? store
-        : seedDemo(store);
-      const next = updater(seeded);
+      const next = updater(store);
       next.complaints = next.complaints.map(refreshComplaintStatus);
       return next;
     }
   );
 }
 
-function seedDemo(store: ComplaintStore): ComplaintStore {
-  const municipal = getCivicBodyById("municipal-new-delhi");
-  if (!municipal) return store;
-  const address: Address = {
-    line1: "14, Barakhamba Road",
-    area: "Connaught Place",
-    city: "New Delhi",
-    state: "Delhi",
-    pincode: "110001",
-  };
-  const older = new Date(Date.now() - 1000 * 60 * 12).toISOString();
-  const recent = new Date(Date.now() - 1000 * 60 * 1).toISOString();
-  const road: Complaint = {
-    id: "demo-complaint-road",
-    trackingId: "CCI-NEW-20260823-ROAD",
-    userId: "demo-anita-sharma",
-    citizenName: "Anita Sharma",
-    citizenEmail: "citizen@demo.in",
-    citizenPhone: "9876543210",
-    categoryId: "roads",
-    title: "Deep pothole near Barakhamba crossing",
-    description:
-      "A large pothole has formed near the Barakhamba Road crossing after rain.",
-    landmark: "Opposite Statesman House",
-    photos: [],
-    address,
-    civicBodyId: municipal.id,
-    civicBodyName: municipal.name,
-    civicBodyEmail: municipal.email,
-    status: "in_progress",
-    timeline: [
-      { status: "submitted", at: older, note: "Complaint registered on CivicConnect India." },
-      { status: "email_sent", at: older, note: `Official complaint emailed to ${municipal.email}.` },
-      { status: "acknowledged", at: new Date(Date.now() - 1000 * 60 * 8).toISOString(), note: "The civic body desk has acknowledged your complaint." },
-      { status: "in_progress", at: new Date(Date.now() - 1000 * 60 * 4).toISOString(), note: "A field team has been assigned and work is in progress." },
-    ],
-    createdAt: older,
-    updatedAt: older,
-  };
-  const light: Complaint = {
-    id: "demo-complaint-light",
-    trackingId: "CCI-NEW-20260823-LITE",
-    userId: "demo-anita-sharma",
-    citizenName: "Anita Sharma",
-    citizenEmail: "citizen@demo.in",
-    citizenPhone: "9876543210",
-    categoryId: "street_lights",
-    title: "Street lights out on the inner circle",
-    description: "Three consecutive street lights on the inner circle have been dark for four nights.",
-    landmark: "Near Palika Bazaar gate",
-    photos: [],
-    address,
-    civicBodyId: municipal.id,
-    civicBodyName: municipal.name,
-    civicBodyEmail: municipal.email,
-    status: "email_sent",
-    timeline: [
-      { status: "submitted", at: recent, note: "Complaint registered on CivicConnect India." },
-      { status: "email_sent", at: recent, note: `Official complaint emailed to ${municipal.email}.` },
-    ],
-    createdAt: recent,
-    updatedAt: recent,
-  };
-  return { complaints: [light, road, ...store.complaints], dispatches: store.dispatches };
-}
+
 
 export async function listUserComplaints(userId: string) {
   const store = await mutateComplaints((current) => current);
@@ -146,10 +79,9 @@ export async function createServerComplaint(input: {
     civicBodyId: match.body.id,
     civicBodyName: match.body.name,
     civicBodyEmail: match.body.email,
-    status: "email_sent",
+    status: "submitted",
     timeline: [
       { status: "submitted", at: createdAt, note: "Complaint registered on CivicConnect India." },
-      { status: "email_sent", at: createdAt, note: `Official complaint emailed to ${match.body.email}.` },
     ],
     createdAt,
     updatedAt: createdAt,
@@ -168,6 +100,40 @@ export async function createServerComplaint(input: {
     photoCount: photos.length,
   });
   const dispatch = createDispatch(complaint, match.body, composed);
+
+  // Actually send the complaint email via Resend if configured
+  let emailSent = false;
+  if (isSmtpConfigured()) {
+    try {
+      await sendMail({
+        to: match.body.email,
+        subject: composed.subject,
+        text: composed.body,
+        html: `<pre style="font-family:Arial,sans-serif;white-space:pre-wrap;max-width:640px;margin:0 auto">${composed.body}</pre>`,
+      });
+      emailSent = true;
+    } catch (error) {
+      console.error(`[complaint] Failed to email ${match.body.email}:`, error);
+    }
+  }
+
+  // Update status based on whether the email was actually sent
+  if (emailSent) {
+    complaint.status = "email_sent";
+    complaint.timeline.push({
+      status: "email_sent",
+      at: createdAt,
+      note: `Official complaint emailed to ${match.body.email}.`,
+    });
+  } else {
+    complaint.timeline.push({
+      status: "submitted",
+      at: createdAt,
+      note: isSmtpConfigured()
+        ? `Email to ${match.body.email} could not be delivered. Use the mailto link on the tracking page to send manually.`
+        : `Email not configured — use the mailto link on the tracking page to send the complaint manually.`,
+    });
+  }
 
   await mutateComplaints((store) => ({
     complaints: [complaint, ...store.complaints],

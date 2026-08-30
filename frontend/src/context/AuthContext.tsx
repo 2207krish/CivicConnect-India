@@ -16,8 +16,8 @@ import {
   apiRegister,
   apiUpdateProfile,
   apiVerifyEmail,
+  type LoginApiResponse,
 } from "@/lib/auth-client";
-import { seedDemoData } from "@/lib/storage";
 import type { Address, PublicUser } from "@/types";
 
 interface RegisterInput {
@@ -31,7 +31,7 @@ interface RegisterInput {
 interface AuthContextValue {
   user: PublicUser | null;
   ready: boolean;
-  login: (email: string, password: string) => Promise<PublicUser>;
+  login: (email: string, password: string, otp?: string) => Promise<LoginApiResponse>;
   register: (input: RegisterInput) => Promise<{
     email: string;
     previewUrl: string | null;
@@ -60,8 +60,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
 
-    Promise.all([seedDemoData().catch(() => undefined), apiMe().catch(() => null)])
-      .then(([, current]) => {
+    apiMe()
+      .catch(() => null)
+      .then((current) => {
         if (!active) return;
         setUser(current);
       })
@@ -78,10 +79,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       ready,
-      async login(email, password) {
-        const result = await apiLogin(email, password);
-        setUser(result.user);
-        return result.user;
+      async login(email, password, otp) {
+        const result = await apiLogin(email, password, otp);
+        if (!result.requiresOtp && result.user) {
+          setUser(result.user);
+        }
+        return result;
       },
       async register(input) {
         const result = await apiRegister(input);

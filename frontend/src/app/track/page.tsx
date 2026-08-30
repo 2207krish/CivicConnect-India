@@ -61,7 +61,7 @@ export default function TrackPage() {
       </form>
 
       <p className="mt-6 text-sm text-slate-500">
-        Demo IDs: CCI-NEW-20260823-ROAD and CCI-NEW-20260823-LITE
+        Enter the CivicConnect ID printed on your complaint acknowledgement.
       </p>
     </AuthSplit>
   );

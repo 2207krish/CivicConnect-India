@@ -13,6 +13,10 @@ export function proxy(request: NextRequest) {
   const proto = request.headers.get("x-forwarded-proto");
   const host = request.headers.get("host") || request.nextUrl.host;
 
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return NextResponse.next();
+  }
+
   if (proto === "http") {
     const redirect = new URL(request.url);
     redirect.protocol = "https:";

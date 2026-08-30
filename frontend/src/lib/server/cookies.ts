@@ -3,6 +3,14 @@ import { cookies } from "next/headers";
 export const SESSION_COOKIE = "cc_session";
 const MAX_AGE = 7 * 24 * 60 * 60;
 
+function isSecure() {
+  return (
+    process.env.FORCE_HTTPS === "true" ||
+    Boolean(process.env.APP_URL?.startsWith("https://")) ||
+    process.env.NODE_ENV === "production"
+  );
+}
+
 export async function setSessionCookie(token: string) {
   const jar = await cookies();
   jar.set({
@@ -10,10 +18,7 @@ export async function setSessionCookie(token: string) {
     value: token,
     httpOnly: true,
     sameSite: "lax",
-    secure:
-      process.env.FORCE_HTTPS === "true" ||
-      Boolean(process.env.APP_URL?.startsWith("https://")) ||
-      process.env.NODE_ENV === "production",
+    secure: isSecure(),
     path: "/",
     maxAge: MAX_AGE,
   });

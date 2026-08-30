@@ -29,6 +29,7 @@ export const registerSchema = z
 export const loginSchema = z.object({
   email: z.string().email("Enter a valid email address"),
   password: z.string().min(1, "Enter your password"),
+  otp: z.string().regex(/^\d{6}$/, "Enter a valid 6-digit OTP").optional().or(z.literal("")),
 });
 
 export const photoUploadSchema = z.object({

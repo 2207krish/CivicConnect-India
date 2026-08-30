@@ -113,7 +113,6 @@ export default function HowItWorksPage() {
                   "Email token expires in 15 minutes and can be resent",
                   "Password reset by email — no support ticket needed",
                   "Same account works on the Android app",
-                  "Demo account: citizen@demo.in / Demo@123",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f7efe3] text-[10px] font-bold text-[var(--saffron)]">

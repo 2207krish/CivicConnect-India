@@ -15,6 +15,7 @@ import { useAuth } from "@/context/AuthContext";
 import { CITIES_BY_STATE, INDIAN_STATES, lookupPincode } from "@/data/locations";
 import { apiGoogleLogin } from "@/lib/auth-client";
 import { renderGoogleButton } from "@/lib/google-auth";
+import { isProfileComplete } from "@/lib/user-utils";
 import { registerSchema, type RegisterValues } from "@/lib/validators";
 
 
@@ -72,9 +73,13 @@ export default function RegisterPage() {
     setFormError("");
     setGoogleLoading(true);
     try {
-      await apiGoogleLogin(idToken);
+      const res = await apiGoogleLogin(idToken);
       await refreshUser();
-      router.push("/dashboard");
+      if (!isProfileComplete(res.user)) {
+        router.push("/onboarding");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Google sign-in failed.");
     } finally {

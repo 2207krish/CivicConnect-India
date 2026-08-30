@@ -3,6 +3,7 @@
 import { Suspense, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { isProfileComplete } from "@/lib/user-utils";
 
 export default function Protected({ children }: { children: React.ReactNode }) {
   return (
@@ -34,6 +35,13 @@ function ProtectedGate({ children }: { children: React.ReactNode }) {
     }
     if (!user.emailVerified) {
       router.replace(`/verify-email?email=${encodeURIComponent(user.email)}`);
+      return;
+    }
+    if (!isProfileComplete(user) && pathname !== "/onboarding") {
+      const search = searchParams.toString();
+      const next = search ? `${pathname}?${search}` : pathname;
+      router.replace(`/onboarding?next=${encodeURIComponent(next)}`);
+      return;
     }
   }, [pathname, ready, router, searchParams, user]);
 

@@ -49,6 +49,16 @@ export function isSmtpConfigured() {
 }
 
 export function appUrl(request?: Request) {
+  const origin = request?.headers.get("origin");
+  const host = request?.headers.get("host");
+
+  if (origin && (origin.includes("localhost") || origin.includes("127.0.0.1"))) {
+    return origin;
+  }
+  if (host && (host.includes("localhost") || host.includes("127.0.0.1"))) {
+    return `http://${host}`;
+  }
+
   const configured = process.env.APP_URL?.trim().replace(/\/$/, "");
-  return configured || request?.headers.get("origin") || "http://localhost:3000";
+  return configured || origin || "http://localhost:3000";
 }

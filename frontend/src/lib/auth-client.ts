@@ -56,12 +56,16 @@ export async function apiRegister(input: {
   );
 }
 
-export async function apiLogin(email: string, password: string) {
-  return parseResponse<{ ok: true; user: PublicUser }>(
+export type LoginApiResponse =
+  | { ok: true; requiresOtp: true; email: string; message: string; user?: never }
+  | { ok: true; requiresOtp?: false; user: PublicUser; message?: never };
+
+export async function apiLogin(email: string, password: string, otp?: string) {
+  return parseResponse<LoginApiResponse>(
     await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, otp }),
     })
   );
 }
