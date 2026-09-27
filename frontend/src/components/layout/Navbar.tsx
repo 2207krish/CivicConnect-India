@@ -49,6 +49,12 @@ const exploreLinks = [
 
 const infoLinks = [
   {
+    href: "/about",
+    label: "About Us",
+    desc: "Our mission, vision \u0026 team",
+    Icon: Info,
+  },
+  {
     href: "/how-it-works",
     label: "How It Works",
     desc: "Four steps from address to desk",

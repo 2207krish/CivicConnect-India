@@ -13,6 +13,7 @@ const footerLinks = [
   { title: "Track complaint", href: "/track" },
   { title: "Civic bodies", href: "/civic-bodies" },
   { title: "Civic awareness guide", href: "/learn" },
+  { title: "About Us", href: "/about" },
   { title: "Contact & feedback", href: "/contact" },
   { title: "Privacy Policy", href: "/privacy" },
   { title: "Terms of Service", href: "/terms" },

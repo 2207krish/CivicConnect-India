@@ -13,7 +13,7 @@ export default function PrivacyPolicyPage() {
   const { developer } = siteConfig;
 
   return (
-    <LegalPage eyebrow="Legal" title="Privacy Policy" updated="24 August 2026">
+    <LegalPage eyebrow="Legal" title="Privacy Policy" updated="27 September 2026">
       <p>
         CivicConnect India (“CivicConnect”, “we”, “us”) is a citizen grievance
         routing service operated by {developer.name}. This policy explains what
@@ -109,13 +109,117 @@ export default function PrivacyPolicyPage() {
       <LegalSection title="5. Cookies and similar technology">
         <p>
           The website uses an HttpOnly session cookie named <code>cc_session</code>{" "}
-          so you stay signed in. Advertising partners may set their own cookies
-          when ads are enabled. You can block cookies in your browser; some
+          so you stay signed in. You can block cookies in your browser; some
           features such as login will then not work.
+        </p>
+        <p>
+          <strong>DoubleClick DART cookies.</strong> Third-party advertising
+          vendors, including Google, use the DoubleClick DART cookie to serve
+          ads on CivicConnect based on your visits to this site and other sites
+          on the Internet. The DART cookie is set by Google&apos;s ad-serving
+          technology and is used to track the ads that have been served to your
+          browser, the websites you have visited, and whether you have taken
+          any action on an ad (such as clicking it). The DART cookie is not used
+          by Google to track personally identifiable information about you.
+        </p>
+        <p>
+          <strong>Third-party ad cookies.</strong> Third-party vendors,
+          including Google, use cookies to serve ads based on a user&apos;s prior
+          visits to CivicConnect and other websites. Google&apos;s use of advertising
+          cookies enables it and its partners to serve ads to our users based
+          on their visit to CivicConnect and/or other sites on the Internet.
+        </p>
+        <p>
+          <strong>Opting out of personalised advertising.</strong> You may opt
+          out of personalised advertising by visiting{" "}
+          <a
+            className="font-semibold text-[var(--saffron)]"
+            href="https://www.google.com/settings/ads"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Google&apos;s Ads Settings
+          </a>
+          . Alternatively, you can opt out of a third-party vendor&apos;s use of
+          cookies for personalised advertising by visiting{" "}
+          <a
+            className="font-semibold text-[var(--saffron)]"
+            href="https://www.aboutads.info/choices/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            www.aboutads.info/choices
+          </a>
+          . You may also visit the{" "}
+          <a
+            className="font-semibold text-[var(--saffron)]"
+            href="https://optout.networkadvertising.org/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Network Advertising Initiative opt-out page
+          </a>
+          .
         </p>
       </LegalSection>
 
-      <LegalSection title="6. Retention">
+      <LegalSection title="6. Third-party advertising">
+        <p>
+          CivicConnect uses Google AdSense to display advertisements on the
+          website and Google AdMob to display advertisements in the Android
+          app. These services are provided by Google LLC. Google, as a
+          third-party vendor, uses cookies — including the DoubleClick DART
+          cookie — to serve ads based on your prior visits to CivicConnect
+          and other websites.
+        </p>
+        <p>Specifically:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>
+            Google uses the DoubleClick DART cookie to enable it and its
+            partners to serve ads to you based on your visit to CivicConnect
+            and/or other websites on the Internet.
+          </li>
+          <li>
+            Google may collect and use anonymous data (not including your name,
+            address, email address, or telephone number) about your visits to
+            this and other websites in order to provide advertisements about
+            goods and services of interest to you.
+          </li>
+          <li>
+            You may opt out of the use of the DART cookie by visiting the{" "}
+            <a
+              className="font-semibold text-[var(--saffron)]"
+              href="https://www.google.com/settings/ads"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Google Ads Settings page
+            </a>
+            .
+          </li>
+          <li>
+            For more information about how Google manages data in its ads
+            products, visit{" "}
+            <a
+              className="font-semibold text-[var(--saffron)]"
+              href="https://policies.google.com/technologies/partner-sites"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Google&apos;s Partner Sites policy
+            </a>
+            .
+          </li>
+        </ul>
+        <p>
+          We do not have access to or control over cookies that are used by
+          third-party advertisers. We encourage you to read the respective
+          privacy policies of these third-party ad servers for more
+          information.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="7. Retention">
         <p>
           Account, complaint and feedback records are kept while they are needed
           to run the service and to let you track cases. Verification and reset
@@ -126,7 +230,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="7. Children’s privacy">
+      <LegalSection title="8. Children’s privacy">
         <p>
           CivicConnect is meant for adults who can file civic complaints. Do not
           create an account for a child under 18. If you believe we hold such
@@ -134,7 +238,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="8. Your choices (including DPDP)">
+      <LegalSection title="9. Your choices (including DPDP)">
         <p>
           Subject to the Digital Personal Data Protection Act, 2023 and other
           applicable Indian law, you may request access, correction or erasure
@@ -144,7 +248,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="9. Security">
+      <LegalSection title="10. Security">
         <p>
           We use hashed passwords, session cookies and HTTPS when the site is
           hosted with TLS. No method of transmission or storage is completely
@@ -152,7 +256,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="10. Changes">
+      <LegalSection title="11. Changes">
         <p>
           We may update this policy when the product changes. The “Last updated”
           date at the top will change. Continued use after an update means you
@@ -160,7 +264,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="11. Related terms">
+      <LegalSection title="12. Related terms">
         <p>
           Use of CivicConnect is also governed by our{" "}
           <LegalLink href="/terms">Terms of Service</LegalLink>.

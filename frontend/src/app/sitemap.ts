@@ -12,10 +12,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     "",
     "/learn",
+    "/about",
     "/civic-bodies",
     "/track",
     "/download",
     "/contact",
+    "/faq",
     "/privacy",
     "/terms",
     "/register",
