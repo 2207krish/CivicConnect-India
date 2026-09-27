@@ -11,13 +11,22 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+        NEXT_PUBLIC_ADSENSE_CLIENT: ${NEXT_PUBLIC_ADSENSE_CLIENT:-ca-pub-2068627560078285}
+        APP_URL: https://${SITE_DOMAIN:-civicconnect.co.in}
     restart: unless-stopped
     env_file:
-      - ./frontend/.env.local
+      - path: ./frontend/.env
+        required: false
+      - path: ./frontend/.env.local
+        required: false
+      - path: ./.env
+        required: false
     environment:
       NODE_ENV: production
       FORCE_HTTPS: "true"
-      APP_URL: https://${SITE_DOMAIN}
+      APP_URL: https://${SITE_DOMAIN:-civicconnect.co.in}
     volumes:
       - civic-data:/app/.data
     expose:
